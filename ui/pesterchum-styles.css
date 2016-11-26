@@ -1,0 +1,157 @@
+.Gui{
+	background-color: #FFB500;
+	border-image: url(ui/pesterchum/pcbg.png);
+}
+.QLabel#appLabel{
+	color: white;
+	font-size: 20px;
+	padding: 5px;
+	font-family: courier;
+	font-weight: bold;
+}
+.QMenuBar#menubar{
+	color: black;
+	font-weight: bold;
+	font-family: courier;
+	background-color: transparent;
+}
+.QMenu#clientMenu, .QMenu#profileMenu, .QMenu#helpMenu{
+	color: black;
+	font-weight: bold;
+	font-family: courier;
+	background-color: #FFB500;
+	border-color:yellow;
+	border-style:solid;
+	border-width:2px;
+}
+.QTreeWidget#chumsTree{
+	background-color: black;
+	color:#666;
+	border-color: #FFFF00;
+	border-style: solid;
+	border-width: 3px;
+	font-family: courier;
+}
+.QPushButton#addChumButton{
+	text-align: center;
+	background-color:yellow;
+	border-color:#BB8800;
+	border-style:solid;
+	border-width:2px;
+	font-family: courier;
+	padding: 5px 0px 5px 0px;
+}
+.QPushButton#pesterButton{
+	text-align: center;
+	background-color:yellow;
+	border-color:#BB8800;
+	border-style:solid;
+	border-width:2px;
+	font-family: courier;
+	padding: 5px 0px 5px 0px;
+}
+.QPushButton#blockButton{
+	text-align: center;
+	background-color:red;
+	border-color:#BB8800;
+	border-style:solid;
+	border-width:2px;
+	font-family: courier;
+	padding: 5px 0px 5px 0px;
+}
+.QPushButton#nameButton{
+	background-color: black;
+	color:white;
+	text-align: left;
+	border-color: #FFFF00;
+	border-style: solid;
+	border-width: 2px;
+	font-family: courier;
+	padding: 3px 0px 3px 2px;
+}
+.QPushButton#chummyButton,.QPushButton#bullyButton,.QPushButton#palsyButton,.QPushButton#chipperButton,.QPushButton#peppyButton{
+	text-align: left;
+	background-color:yellow;
+	border-color:#BB8800;
+	border-style:solid;
+	border-width:2px;
+	padding: 5px 0px 5px 0px;
+	font-family: courier;
+	font-size:5px;
+}
+.QPushButton#abscondButton{
+	text-align: center;
+	background-color:black;
+	border-color:#BB8800;
+	border-style:solid;
+	border-width:2px;
+	color: white;
+	padding: 5px 0px 5px 0px;
+	font-family: courier;
+}
+.QPushButton#rancorousButton{
+	text-align: left;
+	background-color:red;
+	border-color:#BB8800;
+	border-style:solid;
+	border-width:2px;
+	padding: 5px 0px 5px 0px;
+	font-family: courier;
+}
+.TabWindow{
+	background-color: #FFB500;
+	border-color: #FFFF00;
+	border-style: solid;
+	border-width: 2px;
+}
+.QTabWidget::pane {
+	background-color: #FFB500;
+	border-color: #FFFF00;
+	border-style: solid;
+	border-width: 2px;
+}
+.QTabBar::tab{
+	background-color: #FFB500;
+	border-top: 2px solid #FFFF00;
+	border-left: 2px solid #FFFF00;
+	border-right: 2px solid #FFFF00;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+	min-width: 15ex;
+	font-size: 12px;
+	left: 5px;
+	font-family: Courier;
+	min-height:25px;
+}
+.PrivateMessageWidget{
+	background-color: #FFB500;
+	border-color: #FFFF00;
+	border-style: solid;
+	border-width: 2px;
+}
+.QLabel#userLabel{
+	padding: 13px 0px 13px 0px;
+	height:60px;
+	color:white;
+	background-color:#BB8800;
+	font-size: 15px;
+}
+.QTextEdit#userOutput{
+	border-color: #BB8800;
+	border-style: solid;
+	border-width: 2px;
+}
+.QLineEdit#userInput{
+	border-color: #BB8800;
+	border-style: solid;
+	border-width: 2px;
+}
+.QPushButton#sendButton{
+	text-align: left;
+	background-color:yellow;
+	border-color:#BB8800;
+	border-style:solid;
+	border-width:2px;
+	padding: 3px 0px 3px 0px;
+	font-family: courier;
+}
