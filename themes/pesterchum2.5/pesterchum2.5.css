@@ -15,9 +15,8 @@
 	font-family: courier;
 	background-color: transparent;
 }
-.QMenu#clientMenu, .QMenu#profileMenu, .QMenu#helpMenu{
+.QMenu{
 	color: black;
-	font-weight: bold;
 	font-family: courier;
 	background-color: #FFB500;
 	border-color:yellow;
@@ -155,4 +154,29 @@
 	border-width:2px;
 	padding: 3px 0px 3px 0px;
 	font-family: courier;
+}
+.SwitchDialog{
+	background-color: #fdb302;
+	font-family: Courier;
+}
+.QLabel#chamhanelLabel{
+	font-family: Courier;
+}
+.QLineEdit#getHandleInput{
+	background-color: #fdb302;
+}
+.QLabel#chooseProfileLabel{
+	font-family: Courier;
+}
+.QComboBox#profilesDropdown{
+	background-color: #fdb302;
+}
+.QComboBox#profilesDropdown::selection{
+	background-color: #aaa;
+}
+.QPushButton#cancelButton, .QPushButton#proceedButton, .QPushButton#deleteProfileButton{
+	background-color: #fdb302;
+}
+.QCheckBox#defaultCheckBox{
+	background-color: #fdb302;
 }
