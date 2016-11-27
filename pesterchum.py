@@ -5,11 +5,12 @@ from quamash import QEventLoop
 
 import asyncio, sys, os.path, json, re
 from asyncio import async as aioasync
-from random import randint
 
 from gui import Gui
 from client import Client
+from themes import *
 from messages import *
+from config import Config, template_config
             
 class App(QApplication):
     def __init__(self):
@@ -17,19 +18,18 @@ class App(QApplication):
         loop = QEventLoop(self)
         self.loop = loop
         asyncio.set_event_loop(loop)
+
+        self.config = Config
         
-        with open("ui/pesterchum-styles.css") as styles:
-            self.styles = styles.read()
-            self.setStyleSheet(self.styles)
-        with open("resources/config.json", 'r') as config:
-            data = config.read()
-            if data:
-                self.config = json.loads(data)
-            else:
-                name = "pesterClient" + str(randint(100,700))
-                self.config = dict(users={name:"#000"}, lastUser=name, friends={}, username=name, lastTheme="pesterchum2.5")
+        self.theme = themes[self.config["lastTheme"]]
+        self.theme_name = self.theme["name"]
+        self.setStyleSheet(self.theme["styles"])
 
         self.friends = self.config["friends"]
+        self.users = self.config["users"]
+        self.userlist = self.config["userlist"]
+        self.userlist.update(self.users)
+        self.userlist.update(self.friends)
         self.host = "irc.mindfang.org"
         self.port = 1413
         self.username = self.config['username']
@@ -45,6 +45,11 @@ class App(QApplication):
         self.gui.initialize()
         loop.run_forever()
 
+    def change_color(self, color):
+        self.color = color
+        self.userlist[self.nick] = color
+        self.users[self.nick] = color
+
     def send_msg(self, msg, user=None):
         process_send_msg(self, msg, user=user)
 
@@ -53,7 +58,7 @@ class App(QApplication):
 
     def pm_received(self, msg, user):
         tab = self.gui.start_privmsg(user)
-        tab.userOutput.insertHtml(msg.strip() + "<br />")
+        tab.display_text(msg, user=user)
 
     def connection_lost(self, exc):
         print("Connection lost")

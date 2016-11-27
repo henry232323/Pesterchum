@@ -5,7 +5,8 @@ from PyQt5 import uic
 
 import os.path, json
 
-from themes import themes
+from themes import *
+from messages import *
 
 class Gui(QMainWindow):
     def __init__(self, loop, app, **kwargs):
@@ -15,10 +16,13 @@ class Gui(QMainWindow):
         self.loop = loop
         self.friends = self.app.friends
         self.color = self.app.color
-        self.theme = themes[self.app.config["lastTheme"]]
+        self.theme = self.app.theme
 
     def initialize(self):
-        self.widget = uic.loadUi(os.path.join('ui', 'Main.ui'), self)
+        self.widget = uic.loadUi(self.theme["ui_path"] + "/Main.ui", self)
+        width = self.frameGeometry().width()
+        height = self.frameGeometry().height()
+        self.setFixedSize(width, height)
         self.setWindowTitle('Pesterchum')
         self.setWindowIcon(QIcon("resources/pc_chummy.png"))
         self.setWindowFlags(Qt.FramelessWindowHint)
@@ -43,18 +47,18 @@ class Gui(QMainWindow):
                                  peppy=self.peppyButton,
                                  rancorous=self.rancorousButton,
                                  abscond=self.abscondButton)
-        self.nameButton.setIcon(QIcon("ui/pesterchum/chummy.png"))
+        self.nameButton.setIcon(QIcon(self.theme["path"] + "/chummy.png"))
         for name, button in self.mood_buttons.items():
-            button.setIcon(QIcon("ui/pesterchum/" + name + ".png"))
-            button.setStyleSheet(self.app.styles)
+            button.setIcon(QIcon(os.path.join(self.theme["path"], name + ".png")))
+            button.setStyleSheet(self.theme["styles"])
             button.clicked.connect(self.make_setMood(button))
 
         self.colorButton.clicked.connect(self.color_picker)
 
-        for item in self.friends:
+        for item in self.friends.keys():
             treeitem = QTreeWidgetItem()
             treeitem.setText(0, item)
-            treeitem.setIcon(0, QIcon("ui/pesterchum/offline.png"))
+            treeitem.setIcon(0, QIcon(self.theme["path"] + "/offline.png"))
             self.chumsTree.addTopLevelItem(treeitem)
             
         self.chumsTree.itemDoubleClicked.connect(self.open_privmsg)
@@ -85,6 +89,7 @@ class Gui(QMainWindow):
         color = QColorDialog.getColor()
         self.color = color.name()
         self.colorButton.setStyleSheet('background-color:' + self.color + ';')
+        self.app.change_color(self.color)
 
     def make_setMood(self, button):
         def setMood():
@@ -92,7 +97,7 @@ class Gui(QMainWindow):
                 if button != moodButton:
                     moodButton.setChecked(False)
                 else:
-                    self.nameButton.setIcon(QIcon("ui/pesterchum/" + name + ".png"))
+                    self.nameButton.setIcon(QIcon(os.path.join(self.theme["path"], name + ".png")))
         return setMood
 
     @pyqtSlot()
@@ -110,10 +115,11 @@ class Gui(QMainWindow):
 class PrivateMessageWidget(QWidget):
     def __init__(self, container, parent, user):
         super(__class__, self).__init__()
-        uic.loadUi("ui/PrivateMessageWidget.ui", self)
-        self.user = user
         self.parent = parent
+        uic.loadUi(self.parent.parent.theme["ui_path"] + "/PrivateMessageWidget.ui", self)
+        self.user = user
         self.userLabel.setText(user.join("::"))
+        self.userOutput.setEnabled(False)
         self.sendButton.clicked.connect(self.send)
         
     def send(self):
@@ -122,7 +128,14 @@ class PrivateMessageWidget(QWidget):
             user = self.user
             self.parent.parent.app.send_msg(msg, user=user)
             self.userInput.setText("")
-            self.userOutput.insertHtml(msg + "<br />")
+            self.display_text(msg)          
+
+    def display_text(self, msg, user=None):
+        try:
+            nmsg = fmt_disp_msg(self.parent.parent.app, msg, user=user)
+            self.userOutput.insertHtml(nmsg)
+        except Exception as e:
+            print(e)
 
     def keyPressEvent(self, event):
         if event.key() == Qt.Key_Return:
@@ -131,9 +144,9 @@ class PrivateMessageWidget(QWidget):
 class TabWindow(QWidget):
     def __init__(self, parent, user):
         super(__class__, self).__init__()
-        uic.loadUi("ui/TabWindow.ui", self)
-        self.users = []
         self.parent=parent
+        uic.loadUi(parent.theme["ui_path"] + "/TabWindow.ui", self)
+        self.users = []
         self.init_user = self.add_user(user)
         self.tabWidget.removeTab(0)
         self.tabWidget.removeTab(0)
@@ -151,7 +164,7 @@ class TabWindow(QWidget):
             windw = PrivateMessageWidget(self.tabWidget, self, user)
             a = self.tabWidget.addTab(windw, user)
             tab = self.tabWidget.widget(a)
-            tab.setStyleSheet(self.parent.app.styles)
+            tab.setStyleSheet(self.parent.theme["styles"])
             self.users.append(user)
             return tab
         else:
