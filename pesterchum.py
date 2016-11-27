@@ -1,5 +1,5 @@
 from PyQt5.QtWidgets import *
-from PyQt5.QtGui import QIcon, QFont, QTextCursor
+from PyQt5.QtGui import QIcon, QFont, QTextCursor, QColor
 from PyQt5.QtCore import Qt
 from quamash import QEventLoop
 
@@ -24,6 +24,7 @@ class App(QApplication):
         self.theme = themes[self.config["lastTheme"]]
         self.theme_name = self.theme["name"]
         self.setStyleSheet(self.theme["styles"])
+        self.palette().highlight().setColor(QColor("#CCCCCC"))
 
         self.friends = self.config["friends"]
         self.users = self.config["users"]
@@ -34,7 +35,7 @@ class App(QApplication):
         self.port = 1413
         self.username = self.config['username']
         self.realname = self.config['username']
-        self.nick = self.config['lastUser']
+        self.nick = self.config['defaultuser']
         self.users = self.config['users']
         self.color = self.users[self.nick] if self.nick in self.users.keys() else "#000"
 
@@ -45,10 +46,18 @@ class App(QApplication):
         self.gui.initialize()
         loop.run_forever()
 
+    def change_nick(self, nick, color):
+        self.nick = nick
+        self.change_color(color)
+        self.client.send("NICK {}\r\n".format(self.nick))
+        self.gui.nameButton.setText(self.nick)
+        
+        
     def change_color(self, color):
         self.color = color
         self.userlist[self.nick] = color
         self.users[self.nick] = color
+        self.gui.colorButton.setStyleSheet('background-color:' + self.color + ';')
 
     def send_msg(self, msg, user=None):
         process_send_msg(self, msg, user=user)
@@ -65,6 +74,12 @@ class App(QApplication):
 
     def exit(self):
         with open("resources/config.json", 'w') as config:
+            self.config["friends"] = self.friends
+            self.config["users"] = self.users
+            self.config["userlist"] = self.userlist
+            self.config['username'] = self.username
+            self.config['defaultuser'] = self.nick
+            self.config['users'] = self.users
             config.write(json.dumps(self.config))
         sys.exit()
         

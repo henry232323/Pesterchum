@@ -1,5 +1,5 @@
 from PyQt5.QtWidgets import *
-from PyQt5.QtGui import QIcon, QFont, QTextCursor, QPixmap
+from PyQt5.QtGui import QIcon, QFont, QTextCursor, QPixmap, QColor
 from PyQt5.QtCore import Qt, pyqtSlot
 from PyQt5 import uic
 
@@ -33,12 +33,17 @@ class Gui(QMainWindow):
         
         self.menubar = self.menuBar()
         self.clientMenu = self.menubar.addMenu("Client")
+        self.clientMenu.setStyleSheet(self.theme["styles"])
         self.profileMenu = self.menubar.addMenu("Profile")
         self.helpMenu = self.menubar.addMenu("Help")
 
-        self.exitClient = QAction("Exit",self)
+        self.exitClient = QAction("EXIT",self)
         self.exitClient.triggered.connect(self.app.exit)
         self.clientMenu.addAction(self.exitClient)
+
+        self.openSwitch = QAction("SWITCH", self)
+        self.openSwitch.triggered.connect(self.openSwitchDialog)
+        self.profileMenu.addAction(self.openSwitch)
 
         self.mood_buttons = dict(chummy=self.chummyButton,
                                  bully=self.bullyButton,
@@ -67,6 +72,9 @@ class Gui(QMainWindow):
         self.colorButton.setStyleSheet('background-color:' + self.color)
         self.show()
 
+    def openSwitchDialog(self):
+        self.switchDialog = SwitchDialog(self)
+
     def start_privmsg(self, user):
         if not self.tabWindow:
             self.tabWindow = TabWindow(self, user)
@@ -88,7 +96,6 @@ class Gui(QMainWindow):
     def color_picker(self):
         color = QColorDialog.getColor()
         self.color = color.name()
-        self.colorButton.setStyleSheet('background-color:' + self.color + ';')
         self.app.change_color(self.color)
 
     def make_setMood(self, button):
@@ -169,3 +176,65 @@ class TabWindow(QWidget):
             return tab
         else:
             return self.tabWidget.widget(self.users.index(user))
+
+class SwitchDialog(QDialog):
+    def __init__(self, parent):
+        super(__class__, self).__init__()
+        try:
+            self.parent = parent
+            uic.loadUi(parent.theme["ui_path"] + "/SwitchDialog.ui", self)
+            self.setWindowTitle('Switch')
+            self.setWindowIcon(QIcon("resources/pc_chummy.png"))
+            self.setStyleSheet(self.parent.theme["styles"])
+            self.palette().highlight().setColor(QColor("#CCC"))
+            self.proceedButton.clicked.connect(self.accepted)
+            self.cancelButton.clicked.connect(self.close)
+            self.deleteProfileButton.clicked.connect(self.delete_profile)
+            self.colorButton.clicked.connect(self.color_picker)
+            self.colorButton.setStyleSheet('background-color:' + self.parent.color)
+            self.color = self.parent.color
+            self.profilesDropdown.insertItem(0, "Choose a profile...")
+            self.profilesDropdown.insertItems(1, self.parent.app.users.keys())
+            self.changeFromLabel.setText("CHANGING FROM {}".format(self.parent.app.nick))
+            self.show()
+        except Exception as e:
+            print(e)
+
+    def color_picker(self):
+        color = QColorDialog.getColor()
+        self.color = color.name()
+        self.colorButton.setStyleSheet('background-color:' + self.color + ';')
+
+    def accepted(self):
+        nick = self.getHandleInput.text()
+        selected_name = self.profilesDropdown.currentText()
+        if nick:
+            self.parent.app.change_nick(nick, self.color)
+        elif selected_name != "Choose a profile...":
+            self.parent.app.change_nick(selected_name, self.parent.app.users[selected_name])
+        self.close()
+
+    def delete_profile(self):
+        selected_name = self.profilesDropdown.currentText()
+        confirm = ConfirmDeleteDialog(self, selected_name)
+        if confirm.accepted:
+            if selected_name in self.parent.app.users.keys():
+                del self.parent.app.users[selected_name]
+                self.profilesDropdown.removeItem(self.profilesDropdown.currentIndex())
+class ConfirmDeleteDialog(QDialog):
+    def __init__(self, parent, user):
+        super(__class__, self).__init__()
+        self.parent = parent
+        uic.loadUi(self.parent.parent.theme["ui_path"] + "/ConfirmDeleteDialog.ui", self)
+        self.confirmButtonBox.accepted.connect(self.accepted)
+        self.confirmButtonBox.rejected.connect(self.rejected)
+        self.confirmLabel.setText("Are you sure you want to delete profile {}".format(user))
+        self.exec_()
+
+    def accepted(self):
+        self.accepted = True
+        self.close()
+
+    def rejected(self):
+        self.accepted = False
+        self.close()

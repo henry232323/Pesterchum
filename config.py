@@ -5,7 +5,7 @@ import json
 name = "pcc31"
 uname = "pesterClient" + str(randint(100, 700))
 template_config = dict(users={name:"#000"},
-                   lastUser=uname,
+                   defaultuser=uname,
                    friends=dict(),
                    username=name,
                    lastTheme="pesterchum2.5",
