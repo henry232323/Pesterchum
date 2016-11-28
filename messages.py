@@ -80,6 +80,12 @@ def fmt_disp_msg(app, msg, user=None):
         msg = fmt.format(time=time,init=init,msg=msg.strip(),color=color)
     return msg
 
+def fmt_color(color):
+    if type(color) == tuple:  
+        return "COLOR >{},{},{}".format(*color)
+    else:
+        return "COLOR >{},{},{}".format(*rgb(color, type=tuple))
+
 def getInitials(app, user, b=True, c=False, suffix=None):
     init = user[0].upper()
     for char in user:

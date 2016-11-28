@@ -68,7 +68,7 @@
 	font-family: courier;
 	padding: 3px 0px 3px 2px;
 }
-.QPushButton#chummyButton,.QPushButton#bullyButton,.QPushButton#palsyButton,.QPushButton#chipperButton,.QPushButton#peppyButton{
+.QPushButton[checkable="true"]{
 	text-align: left;
 	background-color:yellow;
 	border-color:#BB8800;
@@ -78,15 +78,15 @@
 	font-family: courier;
 	font-size:5px;
 }
-.QPushButton#abscondButton{
-	text-align: center;
-	background-color:black;
+.QPushButton[checkable="true"]::checked{
+	text-align: left;
+	background-color:white;
 	border-color:#BB8800;
 	border-style:solid;
 	border-width:2px;
-	color: white;
 	padding: 5px 0px 5px 0px;
 	font-family: courier;
+	font-size:5px;
 }
 .QPushButton#rancorousButton{
 	text-align: left;
@@ -96,6 +96,16 @@
 	border-width:2px;
 	padding: 5px 0px 5px 0px;
 	font-family: courier;
+}
+.QPushButton#rancorousButton::checked{
+	text-align: left;
+	background-color:white;
+	border-color:#BB8800;
+	border-style:solid;
+	border-width:2px;
+	padding: 5px 0px 5px 0px;
+	font-family: courier;
+	color: red;
 }
 .TabWindow{
 	background-color: #FFB500;
