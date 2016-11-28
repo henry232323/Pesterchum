@@ -18,6 +18,7 @@ class App(QApplication):
         loop = QEventLoop(self)
         self.loop = loop
         asyncio.set_event_loop(loop)
+        self.connected = False
 
         self.config = Config
         
@@ -58,6 +59,8 @@ class App(QApplication):
         self.userlist[self.nick] = color
         self.users[self.nick] = color
         self.gui.colorButton.setStyleSheet('background-color:' + self.color + ';')
+        for user in self.userlist.keys():
+            self.send_msg("COLOR >{}, {}, {}".format(*rgb(self.color)), user=user)
 
     def send_msg(self, msg, user=None):
         process_send_msg(self, msg, user=user)
@@ -67,11 +70,55 @@ class App(QApplication):
 
     def pm_received(self, msg, user):
         tab = self.gui.start_privmsg(user)
-        tab.display_text(msg, user=user)
+        tab.display_text(msg)
+
+    def pm_begin(self, msg, user):
+        tab = self.gui.start_privmsg(user)
+        tab.display_text(msg)
+
+    def pm_cease(self, msg, user):
+        if self.gui.tabWindow:
+            tab = self.gui.start_privmsg(user)
+            tab.display_text(msg)
+
+    def add_friend(self, user):
+        self.userlist[user] = self.getColor(user)
+        self.friends[user] = self.getColor(user)
+        treeitem = QTreeWidgetItem()
+        treeitem.setText(0, user)
+        treeitem.setIcon(0, QIcon(self.theme["path"] + "/offline.png"))
+        self.gui.chumsTree.addTopLevelItem(treeitem)
+
+    def send_begin(self, user):
+        self.send_msg("PESTERCHUM:BEGIN", user=user)
+
+    def send_cease(self, user):
+        self.send_msg("PESTERCHUM:CEASE", user=user)
 
     def connection_lost(self, exc):
         print("Connection lost")
+        self.client.transport.close()
+        self.client = Client(self.loop, self.gui, self)
+        coro = self.loop.create_connection(lambda: self.client, self.host, self.port)
+        aioasync(coro)
+        
+    def join(self):
+        join = "JOIN #pesterchum\r\n"
+        self.client.send(join)
+        self.connected = True
 
+    def getColor(self, user):
+        if user in self.userlist.keys():
+            return self.userlist[user]
+        else:
+            self.userlist[user] = "#000000"
+            return "#000000"
+
+    def setColor(self, user, color):
+        self.userlist[user] = color
+        if user in self.friends.keys():
+            self.friends[user] = color
+        
     def exit(self):
         with open("resources/config.json", 'w') as config:
             self.config["friends"] = self.friends
@@ -81,6 +128,8 @@ class App(QApplication):
             self.config['defaultuser'] = self.nick
             self.config['users'] = self.users
             config.write(json.dumps(self.config))
+        msg = "QUIT :Disconnected"
+        self.client.send(msg)
         sys.exit()
         
 app = App()

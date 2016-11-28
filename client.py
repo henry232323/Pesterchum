@@ -11,10 +11,8 @@ class Client(asyncio.Protocol):
         self.transport = transport
         nick = "NICK %s\r\n" % self.app.nick
         user = "USER %s %s %s %s\r\n" % (self.app.username, self.app.host, self.app.host, self.app.realname)
-        join = "JOIN #pesterchum\r\n"
         self.send(nick)
         self.send(user)
-        self.send(join)
         
     def connection_lost(self, exc):
         self.app.connection_lost(exc)
