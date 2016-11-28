@@ -2,38 +2,35 @@ import re
 from datetime import datetime
 
 def process_send_msg(app, msg, user=None):
-    if msg.startswith("/e"):
-        app.client.send(eval(msg[3:])+"\r\n")
+    if user:
+        nmsg = "PRIVMSG {} :{}\r\n".format(user, msg)
+        app.client.send(nmsg)
     else:
-        if user:
-            nmsg = "PRIVMSG {} :{}\r\n".format(user, msg)
-            app.client.send(nmsg)
-        else:
-            app.client.send(msg + "\r\n")
+        app.client.send(msg + "\r\n")
 
 def process_received_msg(app, msg):
-    if msg.startswith("PING"):
+    if ("MODE" in msg) and not app.connected:
+        app.join()
+    elif msg.startswith("PING"):
         nmsg = msg.replace("PING", "PONG")
         app.client.send(nmsg)
     elif msg.startswith(":") and ("PRIVMSG" in msg):
         usergp = re.match(r"(:.*)(?=!)", msg)
         if usergp:
             user = usergp.group(0)[1:]
-            print(user)
         exp = r"PRIVMSG {} :(.*)(?=:PESTERCHUM)*".format(app.nick)
         msggp = re.search(exp, msg)
         if msggp:
             pm = msggp.group(0)[10+len(app.nick):]
-            pm = color_to_span(pm)
-            print(pm)
-            app.pm_received(pm, user)
-    elif msg.startswith(":PESTERCHUM"):
-        print(msg)
-    else:
-        print(msg)
+            if "COLOR >" in pm:
+                colors = pm.strip("COLOR >").split(",")
+                colors = list(map(int,map(str.strip, colors)))
+                app.setColor(user, rgbtohex(*colors))
+            else:
+                pm = fmt_disp_msg(app, pm, user=user)
+                if pm:
+                    app.pm_received(pm, user)
 
-#PRIVMSG {} : *msg PESTERCHUM:BEGIN
-#PRIVMSG {} :COLOR >0,85,127
 def color_to_span(msg):
     exp = r'<c=(.*?)>(.*?)</c>'
     subexp = r'(?<=<c=).*?(?=>)'
@@ -43,25 +40,64 @@ def color_to_span(msg):
     colors = re.sub('</c>', '</span>', colors)
     return colors
 
+def fmt_begin_msg(app, fromuser, touser):
+    msg = "/me began pestering {touser} {toInit} at {time}".format(touser=touser, toInit=getInitials(app, touser, c=True), time=getTime(app))
+    return fmt_me_msg(app, msg, fromuser)
+
+def fmt_cease_msg(app, fromuser, touser):
+    msg = "/me ceased pestering {touser} {toInit} at {time}".format(touser=touser, toInit=getInitials(app, touser, c=True), time=getTime(app))
+    return fmt_me_msg(app, msg, fromuser)
+    
+def fmt_me_msg(app, msg, user):
+    me = msg.split()[0]
+    suffix = me[3:]
+    init = getInitials(app, user, c=True, suffix=suffix)
+    predicate = msg[3+len(suffix):].strip()
+    fmt = '<span style="color:#646464;font-weight:bold;font-size:12px;">-- {user}{suffix} {init} {predicate}--</span><br />'
+    msg = fmt.format(user=user, init=getInitials(app, user, c=True),
+                     time=getTime(app),predicate=predicate, suffix=suffix)
+    return msg
 
 def fmt_disp_msg(app, msg, user=None):
     if not user:
         user = app.nick
-    time = getTime(app)
-    init = getInitials(user, b=False)
-    fmt = "<span style=\"font_weight: bold;\">[{time}] <span style=\"color:{color};\">{init}: {msg}</span></span><br />".format(time=time, init=init, msg=msg.strip(), color=app.userlist[user])
-    return fmt
+    if "PESTERCHUM:BEGIN" in msg:
+        fmt = fmt_begin_msg(app, user, app.nick)
+        app.pm_begin(fmt, user)
+        msg = None
+    elif "PESTERCHUM:CEASE" in msg:
+        fmt = fmt_cease_msg(app, user, app.nick)
+        app.pm_cease(fmt, user)
+        msg = None
+    elif msg.startswith("/me"):
+        msg = fmt_me_msg(app, msg, user)
+    else:
+        msg = color_to_span(msg)
+        time = getTime(app)
+        init = getInitials(app, user, b=False)
+        color = app.getColor(user)
+        fmt = '<span style="font-weight:bold;color:black;">[{time}] <span style="color:{color};">{init}: {msg}</span></span><br />'
+        msg = fmt.format(time=time,init=init,msg=msg.strip(),color=color)
+    return msg
 
-def getInitials(user, b=True):
+def getInitials(app, user, b=True, c=False, suffix=None):
     init = user[0].upper()
     for char in user:
         if char.isupper():
             break
     init += char
+    if suffix:
+        init =+ suffix
     if b:
-        return "[" + init + "]"
+        fin = "[" + init + "]"
     else:
-        return init
+        fin = init
+    if c:
+        fin = '<span style="color:{color}">{fin}</span>'.format(fin=fin, color=app.getColor(user))
+    return fin
+
+def rgbtohex(r,g,b):
+    return '#%02x%02x%02x' % (r,g,b)
 
 def isrgb(match):
     s = match.group(0)
