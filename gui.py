@@ -46,13 +46,13 @@ class Gui(QMainWindow):
         self.openSwitch.triggered.connect(self.openSwitchDialog)
         self.profileMenu.addAction(self.openSwitch)
 
-        self.mood_buttons = dict(chummy=self.chummyButton,
-                                 bully=self.bullyButton,
-                                 palsy=self.palsyButton,
-                                 chipper=self.chipperButton,
-                                 peppy=self.peppyButton,
-                                 rancorous=self.rancorousButton,
-                                 abscond=self.abscondButton)
+        self.mood_buttons = {self.chummyButton.text():self.chummyButton,
+                                 self.prankyButton.text():self.prankyButton,
+                                 self.pleasantButton.text():self.pleasantButton,
+                                 self.smoothButton.text():self.smoothButton,
+                                 self.distraughtButton.text():self.distraughtButton,
+                                 self.rancorousButton.text():self.rancorousButton,
+                                 self.abscondButton.text():self.abscondButton}
         self.nameButton.setIcon(QIcon(self.theme["path"] + "/chummy.png"))
         for name, button in self.mood_buttons.items():
             button.setIcon(QIcon(os.path.join(self.theme["path"], name + ".png")))
@@ -76,18 +76,21 @@ class Gui(QMainWindow):
         self.show()
 
     def openSwitchDialog(self):
-        self.switchDialog = SwitchDialog(self)
+        self.switchDialog = SwitchDialog(self.app, self)
 
     def openFriendDialog(self):
-        self.friendDialog = AddFriendDialog(self)
+        self.friendDialog = AddFriendDialog(self.app, self)
 
     def start_privmsg(self, user):
-        self.app.send_begin(user)
-        if not self.tabWindow:
-            self.tabWindow = TabWindow(self, user)
-            return self.tabWindow.init_user
-        else:
-            return self.tabWindow.add_user(user)
+        try:
+            self.app.send_begin(user)
+            if not self.tabWindow:
+                self.tabWindow = TabWindow(self.app, self, user)
+                return self.tabWindow.init_user
+            else:
+                return self.tabWindow.add_user(user)
+        except Exception as e:
+            print(e)
 
     @pyqtSlot(QTreeWidgetItem)
     def open_privmsg(self, item):
@@ -107,11 +110,15 @@ class Gui(QMainWindow):
 
     def make_setMood(self, button):
         def setMood():
-            for name, moodButton in self.mood_buttons.items():
-                if button != moodButton:
-                    moodButton.setChecked(False)
-                else:
-                    self.nameButton.setIcon(QIcon(os.path.join(self.theme["path"], name + ".png")))
+            try:
+                for name, moodButton in self.mood_buttons.items():
+                    if button != moodButton:
+                        moodButton.setChecked(False)
+                    else:
+                        self.nameButton.setIcon(QIcon(os.path.join(self.theme["path"], name + ".png")))
+                        self.app.changeMood(name)
+            except Exception as e:
+                print(e)
         return setMood
 
     @pyqtSlot()

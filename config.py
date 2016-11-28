@@ -2,12 +2,10 @@ from random import randint
 from copy import deepcopy
 import json
 
-name = "pcc31"
 uname = "pesterClient" + str(randint(100, 700))
-template_config = dict(users={name:"#000"},
+template_config = dict(users={uname:"#000000"},
                    defaultuser=uname,
                    friends=dict(),
-                   username=name,
                    lastTheme="pesterchum2.5",
                    timestamp_show_seconds=False,
                    userlist=dict()) 

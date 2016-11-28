@@ -137,3 +137,8 @@ $RECYCLE.BIN/
 
 # Windows shortcuts
 *.lnk
+
+# Application Ignores
+# ======================
+
+resources/config.json

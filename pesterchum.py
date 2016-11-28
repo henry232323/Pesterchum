@@ -11,6 +11,9 @@ from client import Client
 from themes import *
 from messages import *
 from config import Config, template_config
+from moods import *
+
+#TODO: GETMOOD, LISTEN FOR MOOD CHANGE OF FRIENDS, CURRENT USERS, USERLIST?
             
 class App(QApplication):
     def __init__(self):
@@ -21,6 +24,7 @@ class App(QApplication):
         self.connected = False
 
         self.config = Config
+        self.moods = Moods(self)
         
         self.theme = themes[self.config["lastTheme"]]
         self.theme_name = self.theme["name"]
@@ -34,8 +38,8 @@ class App(QApplication):
         self.userlist.update(self.friends)
         self.host = "irc.mindfang.org"
         self.port = 1413
-        self.username = self.config['username']
-        self.realname = self.config['username']
+        self.username = "pcc31"
+        self.realname = "pcc31"
         self.nick = self.config['defaultuser']
         self.users = self.config['users']
         self.color = self.users[self.nick] if self.nick in self.users.keys() else "#000"
@@ -53,33 +57,37 @@ class App(QApplication):
         self.client.send("NICK {}\r\n".format(self.nick))
         self.gui.nameButton.setText(self.nick)
         
-        
     def change_color(self, color):
         self.color = color
         self.userlist[self.nick] = color
         self.users[self.nick] = color
         self.gui.colorButton.setStyleSheet('background-color:' + self.color + ';')
         for user in self.userlist.keys():
-            self.send_msg("COLOR >{}, {}, {}".format(*rgb(self.color)), user=user)
+            self.send_msg("COLOR >{}, {}, {}".format(*rgb(self.color, type=tuple)), user=user)
+
+    def changeMood(self, name):
+        mood = self.moods.getMood(name)
+        self.send_msg("MOOD >{}".format(mood), user="#pesterchum")
+        self.moods.value = mood
 
     def send_msg(self, msg, user=None):
         process_send_msg(self, msg, user=user)
 
     def msg_received(self, msg):
+        print(msg)
         process_received_msg(self, msg)
 
     def pm_received(self, msg, user):
         tab = self.gui.start_privmsg(user)
         tab.display_text(msg)
 
+
     def pm_begin(self, msg, user):
         tab = self.gui.start_privmsg(user)
         tab.display_text(msg)
 
     def pm_cease(self, msg, user):
-        if self.gui.tabWindow:
-            tab = self.gui.start_privmsg(user)
-            tab.display_text(msg)
+        pass
 
     def add_friend(self, user):
         self.userlist[user] = self.getColor(user)
@@ -91,6 +99,7 @@ class App(QApplication):
 
     def send_begin(self, user):
         self.send_msg("PESTERCHUM:BEGIN", user=user)
+        self.send_msg(fmt_color(self.color), user=user)
 
     def send_cease(self, user):
         self.send_msg("PESTERCHUM:CEASE", user=user)
@@ -124,7 +133,6 @@ class App(QApplication):
             self.config["friends"] = self.friends
             self.config["users"] = self.users
             self.config["userlist"] = self.userlist
-            self.config['username'] = self.username
             self.config['defaultuser'] = self.nick
             self.config['users'] = self.users
             config.write(json.dumps(self.config))
