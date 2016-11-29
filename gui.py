@@ -110,15 +110,15 @@ class Gui(QMainWindow):
 
     def make_setMood(self, button):
         def setMood():
-            try:
-                for name, moodButton in self.mood_buttons.items():
-                    if button != moodButton:
-                        moodButton.setChecked(False)
-                    else:
+            for name, moodButton in self.mood_buttons.items():
+                try:
+                    if button == moodButton:
                         self.nameButton.setIcon(QIcon(os.path.join(self.theme["path"], name + ".png")))
                         self.app.changeMood(name)
-            except Exception as e:
-                print(e)
+                    else:
+                        moodButton.setChecked(False)
+                except Exception as e:
+                    print(e)
         return setMood
 
     @pyqtSlot()
