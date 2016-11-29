@@ -9,9 +9,9 @@ class Moods(object):
         self.usermoods = dict()
 
     def getMood(self, name):
-        "offline" if name.lower() == "abscond" else name
+        name = "offline" if name.lower() == "abscond" else name
         return self.moods.index(name.lower())
 
-    def getName(self, id_):
-        return self.moods[id_]
+    def getName(self, index):
+        return self.moods[index]
 

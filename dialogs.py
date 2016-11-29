@@ -15,7 +15,7 @@ class PrivateMessageWidget(QWidget):
         uic.loadUi(self.parent.parent.theme["ui_path"] + "/PrivateMessageWidget.ui", self)
         self.user = user
         self.app = app
-        self.userLabel.setText(user.join("::"))
+        self.userLabel.setText(user.join(["::", "::"]))
         self.userOutput.setEnabled(False)
         self.sendButton.clicked.connect(self.send)
         self.display_text(fmt_begin_msg(app, self.app.nick, user))
@@ -104,44 +104,63 @@ class SwitchDialog(QDialog):
 
     def delete_profile(self):
         selected_name = self.profilesDropdown.currentText()
-        confirm = ConfirmDeleteDialog(self, selected_name)
+        confirm = ConfirmDeleteDialog(self.app, self, selected_name)
         if confirm.accepted:
             if selected_name in self.app.users.keys():
                 del self.app.users[selected_name]
                 self.profilesDropdown.removeItem(self.profilesDropdown.currentIndex())
 
 class ConfirmDeleteDialog(QDialog):
-    def __init__(self, parent, user):
+    def __init__(self, app, parent, user):
         super(__class__, self).__init__()
         self.parent = parent
-        uic.loadUi(self.parent.parent.theme["ui_path"] + "/ConfirmDeleteDialog.ui", self)
+        uic.loadUi(self.app.theme["ui_path"] + "/ConfirmDeleteDialog.ui", self)
         self.setWindowTitle('Confirm Delete')
         self.setWindowIcon(QIcon("resources/pc_chummy.png"))
-        self.confirmButtonBox.accepted.connect(self.accepted)
-        self.confirmButtonBox.rejected.connect(self.rejected)
-        self.confirmButtonBox.clicked.connect(self.close)
+        self.acceptButton.clicked.connect(self.accepted)
+        self.rejectButton.clicked.connect(self.rejected)
         self.confirmLabel.setText("Are you sure you want to delete profile {}".format(user))
         self.exec_()
 
     def accepted(self):
         self.accepted = True
+        self.close()
 
     def rejected(self):
         self.accepted = False
+        self.close()
 
 class AddFriendDialog(QDialog):
     def __init__(self, app, parent):
         super(__class__, self).__init__()
         self.parent = parent
         self.app = app
-        uic.loadUi(self.parent.theme["ui_path"] + "/AddFriendDialog.ui", self)
+        uic.loadUi(self.app.theme["ui_path"] + "/AddFriendDialog.ui", self)
         self.setWindowTitle('Add Chum')
         self.setWindowIcon(QIcon("resources/pc_chummy.png"))
-        self.confirmButtonBox.accepted.connect(self.accepted)
-        self.confirmButtonBox.clicked.connect(self.close)
+        self.acceptButton.clicked.connect(self.accepted)
+        self.rejectButton.clicked.connect(self.close)
         self.exec_()
 
     def accepted(self):
         user = self.addChumInput.text()
         if user and user.isalpha():
             self.app.add_friend(user)
+            self.close()
+        else:
+            try:
+                self.err = InvalidUserDialog(self.app, self, user)
+            except Exception as e:
+                print(e)
+
+class InvalidUserDialog(QDialog):
+    def __init__(self, app, parent, user):
+        super(__class__, self).__init__()
+        uic.loadUi(app.theme["ui_path"] + "/InvalidUserDialog.ui", self)
+        self.setWindowTitle('Invalid Name')
+        self.setWindowIcon(QIcon("resources/pc_chummy.png"))
+        fmt = "Name <span style='font_weight: bold;'>{}</style> is not valid! Make sure it is alphanumeric"
+        self.errUserLabel.setText(fmt.format(user))                                  
+        self.acceptButton.clicked.connect(self.close)
+        self.exec_()
+        
