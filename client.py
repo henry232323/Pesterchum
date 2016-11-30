@@ -18,4 +18,5 @@ class Client(asyncio.Protocol):
         self.app.msg_received(data.decode())
 
     def send(self, data):
+        #Take data, encode it and send, wraps the transport
         self.transport.write(data.encode())

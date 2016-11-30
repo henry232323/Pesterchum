@@ -3,6 +3,14 @@ import json, os
 themes = dict()
 
 def getThemes():
+    '''
+    Can be called any time to refresh themes, creates a theme
+    for every folder in the themes directory, sets the css file to
+    foldername.css
+    The folder name defines the Theme name
+    All uis located in the ui folder
+    More support for themes to come
+    '''
     global themes
     themedir = os.listdir("themes")
     for theme in themedir:

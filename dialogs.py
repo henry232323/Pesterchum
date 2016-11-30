@@ -10,6 +10,10 @@ from messages import *
 
 class PrivateMessageWidget(QWidget):
     def __init__(self, app, container, parent, user):
+        '''
+        The widget within each tab of TabWindow, a display
+        for new private messages and user input
+        '''
         super(__class__, self).__init__()
         self.parent = parent
         uic.loadUi(self.parent.parent.theme["ui_path"] + "/PrivateMessageWidget.ui", self)
@@ -21,6 +25,7 @@ class PrivateMessageWidget(QWidget):
         self.display_text(fmt_begin_msg(app, self.app.nick, user))
         
     def send(self):
+        '''Send the user the message in the userInput box, called on enter press / send button press'''
         msg = self.userInput.text()
         if msg:
             user = self.user
@@ -30,33 +35,45 @@ class PrivateMessageWidget(QWidget):
             self.display_text(fmt)
 
     def display_text(self, msg):
+        '''Insert msg into the display box'''
         self.userOutput.insertHtml(msg)
 
     def keyPressEvent(self, event):
+        '''Use enter key to send'''
         if event.key() == Qt.Key_Return:
             self.send()
 
 class TabWindow(QWidget):
     def __init__(self, app, parent, user):
+        '''
+        A window for storing PrivateMessageWidget instances, a navigation
+        between current private message users
+        '''
         super(__class__, self).__init__()
         self.parent=parent
         self.app = app
         uic.loadUi(parent.theme["ui_path"] + "/TabWindow.ui", self)
         self.users = []
         self.init_user = self.add_user(user)
-        self.tabWidget.removeTab(0)
+        self.tabWidget.removeTab(0)#Remove two default tabs
         self.tabWidget.removeTab(0)
         self.setWindowTitle("Private Message")
         self.setWindowIcon(QIcon("resources/pc_chummy.png"))
         self.show()
 
     def closeEvent(self, event):
+        '''On window (or tab) close send a PESTERCHUM:CEASE message to each user, destroy self'''
         self.app.tabWindow = None
         for user in self.users:
             self.app.send_cease(user)
         self.destroy()
         
     def add_user(self, user):
+        '''
+        Add a user & PrivateMessageWidget to window, check if it is already there
+        if so, return that user's PM, if not, create and return a PM
+        On PrivateMessageWidget creation, send a PESTERCHUM:BEGIN initiation message
+        '''
         if not user in self.users:
             windw = PrivateMessageWidget(self.app, self.tabWidget, self, user)
             self.app.send_begin(user)
@@ -70,6 +87,10 @@ class TabWindow(QWidget):
 
 class SwitchDialog(QDialog):
     def __init__(self, app, parent):
+        '''
+        A blocking dialog appearing when the user Switch dialog is opened
+        Located in the 'Profile' menu
+        '''
         super(__class__, self).__init__()
         self.parent = parent
         uic.loadUi(parent.theme["ui_path"] + "/SwitchDialog.ui", self)
@@ -77,7 +98,6 @@ class SwitchDialog(QDialog):
         self.setWindowTitle('Switch')
         self.setWindowIcon(QIcon("resources/pc_chummy.png"))
         self.setStyleSheet(self.parent.theme["styles"])
-        self.palette().highlight().setColor(QColor("#CCC"))
         self.proceedButton.clicked.connect(self.accepted)
         self.cancelButton.clicked.connect(self.close)
         self.deleteProfileButton.clicked.connect(self.delete_profile)
@@ -90,11 +110,13 @@ class SwitchDialog(QDialog):
         self.show()
 
     def color_picker(self):
+        '''Open Color Picker dialog, set user's color and colorButton background'''
         color = QColorDialog.getColor()
         self.color = color.name()
         self.colorButton.setStyleSheet('background-color:' + self.color + ';')
 
     def accepted(self):
+        '''Called on accept, changes Nick'''
         nick = self.getHandleInput.text()
         selected_name = self.profilesDropdown.currentText()
         if nick:
@@ -104,6 +126,10 @@ class SwitchDialog(QDialog):
         self.close()
 
     def delete_profile(self):
+        '''
+        Called when attempting to delete profile, asks for confirmation
+        Removes name from selectable profiles and users list
+        '''
         selected_name = self.profilesDropdown.currentText()
         confirm = ConfirmDeleteDialog(self.app, self, selected_name)
         if confirm.accepted:
@@ -113,6 +139,10 @@ class SwitchDialog(QDialog):
 
 class ConfirmDeleteDialog(QDialog):
     def __init__(self, app, parent, user):
+        '''
+        Dialog opened when attempting to delete a profile
+        in the switch menu
+        '''
         super(__class__, self).__init__()
         self.parent = parent
         uic.loadUi(self.app.theme["ui_path"] + "/ConfirmDeleteDialog.ui", self)
@@ -133,6 +163,9 @@ class ConfirmDeleteDialog(QDialog):
 
 class AddFriendDialog(QDialog):
     def __init__(self, app, parent):
+        '''
+        Dialog opened when the Add [Chum] button is pressed, adds to chumsTree widget
+        '''
         super(__class__, self).__init__()
         self.parent = parent
         self.app = app
@@ -144,6 +177,7 @@ class AddFriendDialog(QDialog):
         self.exec_()
 
     def accepted(self):
+        '''Call once accepted, check if name is alphanumeric if not warn and try again'''
         user = self.addChumInput.text()
         if user and user.isalpha():
             self.app.add_friend(user)
@@ -156,6 +190,11 @@ class AddFriendDialog(QDialog):
 
 class InvalidUserDialog(QDialog):
     def __init__(self, app, parent, user):
+        '''
+        Opened when attempting to add a friend with an invalid username
+        Right now only called if the name is non-alphanumeric
+        Only warns
+        '''
         super(__class__, self).__init__()
         uic.loadUi(app.theme["ui_path"] + "/InvalidUserDialog.ui", self)
         self.setWindowTitle('Invalid Name')
