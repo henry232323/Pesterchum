@@ -59,6 +59,7 @@ class TabWindow(QWidget):
     def add_user(self, user):
         if not user in self.users:
             windw = PrivateMessageWidget(self.app, self.tabWidget, self, user)
+            self.app.send_begin(user)
             a = self.tabWidget.addTab(windw, user)
             tab = self.tabWidget.widget(a)
             tab.setStyleSheet(self.app.theme["styles"])
