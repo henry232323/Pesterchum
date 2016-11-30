@@ -83,7 +83,6 @@ class Gui(QMainWindow):
 
     def start_privmsg(self, user):
         try:
-            self.app.send_begin(user)
             if not self.tabWindow:
                 self.tabWindow = TabWindow(self.app, self, user)
                 return self.tabWindow.init_user
@@ -121,6 +120,10 @@ class Gui(QMainWindow):
                     print(e)
         return setMood
 
+    def getFriendItem(self, name):
+        item = self.chumsTree.findItems(name, Qt.MatchContains, 0)
+        return item
+    
     @pyqtSlot()
     def label_mousePressEvent(self, event):
         self.offset = event.pos()

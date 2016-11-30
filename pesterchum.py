@@ -13,7 +13,15 @@ from messages import *
 from config import Config, template_config
 from moods import *
 
-#TODO: GETMOOD, LISTEN FOR MOOD CHANGE OF FRIENDS, CURRENT USERS, USERLIST?
+###################################
+#TODO:                            #
+###################################
+#CURRENT USERS                    #
+#USERLIST                         #
+#Disconnected blocking dialog     #
+#Names list                       #
+#Add comments                     #
+###################################
             
 class App(QApplication):
     def __init__(self):
@@ -70,6 +78,20 @@ class App(QApplication):
         self.send_msg("MOOD >{}".format(mood), user="#pesterchum")
         self.moods.value = mood
 
+    def changeUserMood(self, user, mood):
+        if type(mood) == str:
+            pass
+        elif type(mood) == int:
+            mood = self.moods.getName(mood)
+        else:
+            return
+        item = self.gui.getFriendItem(user)[0]
+        item.setIcon(0, QIcon(os.path.join(self.theme["path"], mood + ".png")))
+        
+    def getFriendsMoods(self, user):
+        for user in self.friends.keys():
+            self.send_msg("GETMOOD {}".format(user))
+
     def send_msg(self, msg, user=None):
         process_send_msg(self, msg, user=user)
 
@@ -80,7 +102,6 @@ class App(QApplication):
     def pm_received(self, msg, user):
         tab = self.gui.start_privmsg(user)
         tab.display_text(msg)
-
 
     def pm_begin(self, msg, user):
         tab = self.gui.start_privmsg(user)
@@ -110,11 +131,18 @@ class App(QApplication):
         self.client = Client(self.loop, self.gui, self)
         coro = self.loop.create_connection(lambda: self.client, self.host, self.port)
         aioasync(coro)
+
+    def connection_made(self, transport):
+        nick = "NICK %s\r\n" % self.nick
+        user = "USER %s %s %s %s\r\n" % (self.username, self.host, self.host, self.realname)
+        self.client.send(nick)
+        self.client.send(user)
         
     def join(self):
         join = "JOIN #pesterchum\r\n"
         self.client.send(join)
         self.connected = True
+        self.send_msg("GETMOOD {}".format("".join(self.friends.keys())), user="#pesterchum")
 
     def getColor(self, user):
         if user in self.userlist.keys():

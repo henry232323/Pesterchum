@@ -14,6 +14,8 @@ def process_received_msg(app, msg):
     elif msg.startswith("PING"):
         nmsg = msg.replace("PING", "PONG")
         app.client.send(nmsg)
+    elif ("GETMOOD" in msg) and (app.nick in msg):
+        app.client.send("MOOD >{}".format(app.moods.value))
     elif msg.startswith(":") and ("PRIVMSG" in msg):
         usergp = re.match(r"(:.*)(?=!)", msg)
         if usergp:
@@ -30,6 +32,15 @@ def process_received_msg(app, msg):
                 pm = fmt_disp_msg(app, pm, user=user)
                 if pm:
                     app.pm_received(pm, user)
+        else:
+            exp = r"(?<=PRIVMSG #pesterchum :MOOD >)(.*)(?=\r\n)*".format(app.nick)
+            mood = re.search(exp, msg)
+            if mood:
+                mood = mood.group(0).strip()
+                mood = int(mood.strip())
+                if user in app.friends.keys():
+                    app.changeUserMood(user, mood)
+        
 
 def color_to_span(msg):
     exp = r'<c=(.*?)>(.*?)</c>'

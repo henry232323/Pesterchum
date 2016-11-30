@@ -9,10 +9,7 @@ class Client(asyncio.Protocol):
     def connection_made(self, transport):
         self.sockname = transport.get_extra_info("sockname")
         self.transport = transport
-        nick = "NICK %s\r\n" % self.app.nick
-        user = "USER %s %s %s %s\r\n" % (self.app.username, self.app.host, self.app.host, self.app.realname)
-        self.send(nick)
-        self.send(user)
+        self.app.connection_made(transport)
         
     def connection_lost(self, exc):
         self.app.connection_lost(exc)
