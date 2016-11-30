@@ -6,7 +6,7 @@ A server specific IRC client built to imitate the Pesterchum chat client as seen
 
 Pictures borrowed from illuminatedWax's version found [here](https://github.com/illuminatedwax/pesterchum)
 
-`
+
 +---------------------------------+
 |TODO:                            |
 +---------------------------------+
@@ -19,4 +19,3 @@ Pictures borrowed from illuminatedWax's version found [here](https://github.com/
 |7. Regularize custom themes      |
 |8. Maybe recreate some themes?   |
 +---------------------------------+
-`
