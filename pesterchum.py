@@ -12,15 +12,6 @@ from themes import *
 from messages import *
 from config import Config, template_config
 from moods import *
-
-###################################
-#TODO:                            #
-###################################
-#CURRENT USERS                    #
-#USERLIST                         #
-#Disconnected blocking dialog     #
-#Names list                       #
-###################################
             
 class App(QApplication):
     def __init__(self):
