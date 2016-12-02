@@ -175,7 +175,7 @@ class AddFriendDialog(QDialog):
         self.acceptButton.clicked.connect(self.accepted)
         self.rejectButton.clicked.connect(self.close)
         self.exec_()
-
+        
     def accepted(self):
         '''Call once accepted, check if name is alphanumeric if not warn and try again'''
         user = self.addChumInput.text()
@@ -187,6 +187,30 @@ class AddFriendDialog(QDialog):
                 self.err = InvalidUserDialog(self.app, self, user)
             except Exception as e:
                 print(e)
+                
+class AddBlockedDialog(QDialog):
+    def __init__(self, app, parent):
+        '''
+        Dialog opened when the Add button is pressed in TROLLSLUM, adds to parent.blockedList widget
+        '''
+        super(__class__, self).__init__()
+        self.parent = parent
+        self.app = app
+        uic.loadUi(self.app.theme["ui_path"] + "/AddBlockedDialog.ui", self)
+        self.setWindowTitle('TROLLSLUM')
+        self.setWindowIcon(QIcon("resources/pc_chummy.png"))
+        self.acceptButton.clicked.connect(self.accepted)
+        self.rejectButton.clicked.connect(self.close)
+        self.exec_()
+
+    def accepted(self):
+        '''Call once accepted, check if name is alphanumeric if not warn and try again'''
+        user = self.addChumInput.text()
+        if user:
+            self.app.add_blocked(user)
+            item = QListWidgetItem(user)
+            self.parent.blockedList.addItem(item)
+            self.close()
 
 class InvalidUserDialog(QDialog):
     def __init__(self, app, parent, user):
@@ -204,3 +228,31 @@ class InvalidUserDialog(QDialog):
         self.acceptButton.clicked.connect(self.close)
         self.exec_()
         
+class BlockedDialog(QDialog):
+    def __init__(self, app, parent):
+        super(__class__, self).__init__()
+        uic.loadUi(app.theme["ui_path"] + "/BlockedDialog.ui", self)
+        self.app = app
+        self.parent = parent
+        self.setWindowTitle('TROLLSLUM')
+        self.setWindowIcon(QIcon("resources/pc_chummy.png"))
+        self.addBlockButton.clicked.connect(self.add)
+        self.removeBlockButton.clicked.connect(self.remove)
+        self.exec_()
+
+    def add(self):
+        dialog = AddBlockedDialog(self.app, self)
+
+    def remove(self):
+        try:
+            selected = self.blockedList.selectedItems()
+            if selected:
+                item = selected[0]
+                index = self.blockedList.indexFromItem(item)
+                self.blockedList.takeItem(index.row())
+                user = item.text()
+                self.app.blocked.remove(user)
+                if user in self.app.friends.keys():
+                    self.app.gui.chumsTree.addItem(QTreeWidgetItem(user, 0))
+        except Exception as e:
+            print(e)

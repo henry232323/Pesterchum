@@ -37,6 +37,7 @@ class App(QApplication):
         self.userlist = self.config["userlist"]
         self.userlist.update(self.users)
         self.userlist.update(self.friends)
+        self.blocked = self.config["blocked"]
         self.host = "irc.mindfang.org"
         self.port = 1413
         self.username = "pcc31"
@@ -69,8 +70,7 @@ class App(QApplication):
         self.users[self.nick] = color
         self.gui.colorButton.setStyleSheet('background-color:' + self.color + ';')
         for user in self.userlist.keys():
-            self.send_msg("COLOR >{}, {}, {}".format(*rgb(self.color, type=tuple)), user=user)
-
+                    self.send_msg(fmt_color(self.color), user=user)
     def changeMood(self, name):
         #Change current user's mood
         mood = self.moods.getMood(name)
@@ -87,6 +87,9 @@ class App(QApplication):
             return
         item = self.gui.getFriendItem(user)[0]
         item.setIcon(0, QIcon(os.path.join(self.theme["path"], mood + ".png")))
+        if self.gui.tabWindow:
+            if user in self.gui.tabWindow.users:
+                self.pm_received(fmt_mood_msg(self, mood, user), user)
         
     def getFriendsMoods(self):
         #Called on connection, use GETMOOD command in #pesterchum
@@ -94,6 +97,7 @@ class App(QApplication):
         self.send_msg("GETMOOD {}".format("".join(self.friends.keys())), user="#pesterchum")
 
     def getFriendMood(self, user):
+        #Get a friend's mood
         self.send_msg("GETMOOD {}".format(user))
 
     def send_msg(self, msg, user=None):
@@ -157,6 +161,11 @@ class App(QApplication):
         user = "USER %s %s %s %s\r\n" % (self.username, self.host, self.host, self.realname)
         self.client.send(nick)
         self.client.send(user)
+        for user in self.userlist.keys():
+                self.send_msg(fmt_color(self.color), user=user)
+
+    def add_blocked(self, user):
+        self.blocked.append(user)
         
     def join(self):
         #Called once the MODE keyword is seen in received messages
@@ -190,6 +199,7 @@ class App(QApplication):
             self.config["userlist"] = self.userlist
             self.config['defaultuser'] = self.nick
             self.config['users'] = self.users
+            self.config['blocked'] = self.blocked
             config.write(json.dumps(self.config))
         msg = "QUIT :Disconnected"
         self.client.send(msg)

@@ -52,10 +52,20 @@ class Gui(QMainWindow):
         self.exitClient.triggered.connect(self.app.exit)
         self.clientMenu.addAction(self.exitClient)
 
-        #Create SWITHC button in 'PROFILE' menu
+        #Create SWITCH button in 'PROFILE' menu
         self.openSwitch = QAction("SWITCH", self)
         self.openSwitch.triggered.connect(self.openSwitchDialog)
         self.profileMenu.addAction(self.openSwitch)
+
+        #Create COLOR button in 'PROFILE' menu
+        self.openPicker = QAction("COLOR", self)
+        self.openPicker.triggered.connect(self.color_picker)
+        self.profileMenu.addAction(self.openPicker)
+
+        #Create TROLLSLUM button in 'PROFILE' menu
+        self.openTrollslum = QAction("TROLLSLUM", self)
+        self.openTrollslum.triggered.connect(self.openBlockedDialog)
+        self.profileMenu.addAction(self.openTrollslum)
 
         #Make dictionary of all current mood buttons, manual for now
         self.mood_buttons = {self.chummyButton.text():self.chummyButton,
@@ -87,6 +97,7 @@ class Gui(QMainWindow):
         #Open new private message on doubleclick
         self.chumsTree.itemDoubleClicked.connect(self.open_privmsg)
         self.pesterButton.clicked.connect(self.privmsg_pester)
+        self.blockButton.clicked.connect(self.block_selected)
 
         #Open Add Friend dialog
         self.addChumButton.clicked.connect(self.openFriendDialog)
@@ -102,6 +113,9 @@ class Gui(QMainWindow):
     def openFriendDialog(self):
         self.friendDialog = AddFriendDialog(self.app, self)
 
+    def openBlockedDialog(self):
+        self.blockedDialog = BlockedDialog(self.app, self)
+            
     def start_privmsg(self, user):
         '''
         Start a private message window, if one exists add a user to it
@@ -117,6 +131,8 @@ class Gui(QMainWindow):
     def open_privmsg(self, item):
         user = item.text(0)
         self.start_privmsg(user)
+        self.tabWindow.raise_()
+        self.tabWindow.activateWindow()
 
     def privmsg_pester(self):
         '''Opens selected user in tree when PESTER! button pressed, same as double click'''
@@ -124,6 +140,16 @@ class Gui(QMainWindow):
         if selected:
             user = selected[0].text(0)
             self.start_privmsg(user)
+            self.tabWindow.raise_()
+            self.tabWindow.activateWindow()
+
+    def block_selected(self):
+        '''Blocks the currently selected user in chumsTree'''
+        selected = self.chumsTree.selectedItems()
+        if selected:
+            user = selected[0].text(0)
+            self.app.add_blocked(user)
+            self.chumsTree.removeItem(selected[0])
 
     def color_picker(self):
         '''Open color picker dialog, change current user color and change colorButton background'''
@@ -138,6 +164,8 @@ class Gui(QMainWindow):
                 if button == moodButton:
                     self.nameButton.setIcon(QIcon(os.path.join(self.theme["path"], name + ".png")))
                     self.app.changeMood(name)
+                else:
+                    moodButton.setChecked(False)
         return setMood
 
     def getFriendItem(self, name):

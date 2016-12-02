@@ -7,6 +7,7 @@ class Moods(object):
              "amazed", "insolent", "bemused"]
 
         self.usermoods = dict()
+        self.value = 1
 
     def getMood(self, name):
         name = "offline" if name.lower() == "abscond" else name

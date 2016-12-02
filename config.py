@@ -9,7 +9,8 @@ template_config = dict(users={uname:"#000000"},
                    friends=dict(),
                    lastTheme="pesterchum2.5",
                    timestamp_show_seconds=False,
-                   userlist=dict()) 
+                   userlist=dict(),
+                   blocked=list()) 
 
 with open("resources/config.json", 'r') as config:
     data = config.read()
