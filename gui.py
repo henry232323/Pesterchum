@@ -47,25 +47,32 @@ class Gui(QMainWindow):
         self.profileMenu = self.menubar.addMenu("Profile")
         self.helpMenu = self.menubar.addMenu("Help")
 
+
+        #Create IDLE button in 'CLIENT' menu
+        self.idleAction = QAction("IDLE", self)
+        self.idleAction.setCheckable(True)
+        self.idleAction.toggled.connect(self.app.toggle_idle)
+        self.clientMenu.addAction(self.idleAction)
+
         #Create EXIT button in 'CLIENT' menu
         self.exitClient = QAction("EXIT",self)
         self.exitClient.triggered.connect(self.app.exit)
         self.clientMenu.addAction(self.exitClient)
 
-        #Create SWITCH button in 'PROFILE' menu
-        self.openSwitch = QAction("SWITCH", self)
-        self.openSwitch.triggered.connect(self.openSwitchDialog)
-        self.profileMenu.addAction(self.openSwitch)
+        #Create TROLLSLUM button in 'PROFILE' menu
+        self.openTrollslum = QAction("TROLLSLUM", self)
+        self.openTrollslum.triggered.connect(self.openBlockedDialog)
+        self.profileMenu.addAction(self.openTrollslum)
 
         #Create COLOR button in 'PROFILE' menu
         self.openPicker = QAction("COLOR", self)
         self.openPicker.triggered.connect(self.color_picker)
         self.profileMenu.addAction(self.openPicker)
 
-        #Create TROLLSLUM button in 'PROFILE' menu
-        self.openTrollslum = QAction("TROLLSLUM", self)
-        self.openTrollslum.triggered.connect(self.openBlockedDialog)
-        self.profileMenu.addAction(self.openTrollslum)
+        #Create SWITCH button in 'PROFILE' menu
+        self.openSwitch = QAction("SWITCH", self)
+        self.openSwitch.triggered.connect(self.openSwitchDialog)
+        self.profileMenu.addAction(self.openSwitch)
 
         #Make dictionary of all current mood buttons, manual for now
         self.mood_buttons = {self.chummyButton.text():self.chummyButton,

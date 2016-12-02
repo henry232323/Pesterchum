@@ -141,5 +141,4 @@ $RECYCLE.BIN/
 # Application Ignores
 # ======================
 
-resources/config.json
-resources/
+**/config.json
