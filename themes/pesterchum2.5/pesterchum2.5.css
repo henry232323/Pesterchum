@@ -6,23 +6,28 @@
 	color: white;
 	font-size: 20px;
 	padding: 5px;
-	font-family: courier;
+	font-family: Courier New;
 	font-weight: bold;
 }
 .QMenuBar#menubar{
 	color: black;
 	font-weight: bold;
-	font-family: courier;
+	font-family: Courier New;
 	background-color: transparent;
 	selection-background-color: transparent;
 }
 .QMenu{
 	color: black;
-	font-family: courier;
+	font-family: Courier New;
 	background-color: #FFB500;
 	border-color:yellow;
 	border-style:solid;
 	border-width:2px;
+	left: -5px;
+	font-weight: bold;
+}
+.QMenu::item:selected{
+	background-color: yellow;
 }
 .QTreeWidget#chumsTree{
 	background-color: black;
@@ -30,7 +35,7 @@
 	border-color: #FFFF00;
 	border-style: solid;
 	border-width: 3px;
-	font-family: courier;
+	font-family: Courier New;
 	selection-background-color: gray;
 }
 .QPushButton#addChumButton{
@@ -39,7 +44,7 @@
 	border-color:#BB8800;
 	border-style:solid;
 	border-width:2px;
-	font-family: courier;
+	font-family: Courier New;
 	padding: 5px 0px 5px 0px;
 }
 .QPushButton#pesterButton{
@@ -48,7 +53,7 @@
 	border-color:#BB8800;
 	border-style:solid;
 	border-width:2px;
-	font-family: courier;
+	font-family: Courier New;
 	padding: 5px 0px 5px 0px;
 }
 .QPushButton#blockButton{
@@ -57,7 +62,7 @@
 	border-color:#BB8800;
 	border-style:solid;
 	border-width:2px;
-	font-family: courier;
+	font-family: Courier New;
 	padding: 5px 0px 5px 0px;
 }
 .QPushButton#nameButton{
@@ -67,7 +72,7 @@
 	border-color: #FFFF00;
 	border-style: solid;
 	border-width: 2px;
-	font-family: courier;
+	font-family: Courier New;
 	padding: 3px 0px 3px 2px;
 }
 .QPushButton[checkable="true"]{
@@ -77,8 +82,8 @@
 	border-style:solid;
 	border-width:2px;
 	padding: 5px 0px 5px 0px;
-	font-family: courier;
-	font-size:5px;
+	font-family: Courier New;
+	font-size:11px;
 }
 .QPushButton[checkable="true"]::checked{
 	text-align: left;
@@ -87,8 +92,8 @@
 	border-style:solid;
 	border-width:2px;
 	padding: 5px 0px 5px 0px;
-	font-family: courier;
-	font-size:5px;
+	font-family: Courier New;
+	font-size:11px;
 }
 .QPushButton#rancorousButton{
 	text-align: left;
@@ -97,7 +102,7 @@
 	border-style:solid;
 	border-width:2px;
 	padding: 5px 0px 5px 0px;
-	font-family: courier;
+	font-family: Courier New;
 }
 .QPushButton#rancorousButton::checked{
 	text-align: left;
@@ -106,7 +111,7 @@
 	border-style:solid;
 	border-width:2px;
 	padding: 5px 0px 5px 0px;
-	font-family: courier;
+	font-family: Courier New;
 	color: red;
 }
 .QPushButton#abscondButton{
@@ -117,7 +122,7 @@
 	border-width:2px;
 	padding: 5px 0px 5px 0px;
 	color: white;
-	font-family: courier;
+	font-family: Courier New;
 }
 .QPushButton#abscondButton::checked{
 	text-align: center;
@@ -126,7 +131,7 @@
 	border-style:solid;
 	border-width:2px;
 	padding: 5px 0px 5px 0px;
-	font-family: courier;
+	font-family: Courier New;
 	color: #CCCCCC;
 }
 .TabWindow{
@@ -151,7 +156,7 @@
 	min-width: 15ex;
 	font-size: 12px;
 	left: 5px;
-	font-family: Courier;
+	font-family: Courier New;
 	min-height:25px;
 }
 .PrivateMessageWidget{
@@ -187,14 +192,14 @@
 	border-style:solid;
 	border-width:2px;
 	padding: 3px 0px 3px 0px;
-	font-family: courier;
+	font-family: Courier New;
 }
 .SwitchDialog{
 	background-color: #fdb302;
-	font-family: Courier;
+	font-family: Courier New;
 }
 .QLabel#chamhanelLabel{
-	font-family: Courier;
+	font-family: Courier New;
 }
 .QLineEdit#getHandleInput{
 	background-color: #fdb302;
@@ -202,34 +207,49 @@
 	selection-background-color: gray;
 }
 .QLabel#chooseProfileLabel{
-	font-family: Courier;
+	font-family: Courier New;
 }
 .QComboBox#profilesDropdown{
 	background-color: #fdb302;
 	selection-background-color: gray;
-	font-family: Courier;
+	font-family: Courier New;
 }
 .QComboBox#profilesDropdown QAbstractItemView {
 	selection-background-color: gray;
 	background-color: #fdb302;
-	font-family: Courier;
+	font-family: Courier New;
 }
-.QPushButton#cancelButton, .QPushButton#proceedButton, .QPushButton#deleteProfileButton, .QPushButton#acceptButton, .QPushButton#rejectButton{
+.QPushButton#cancelButton, .QPushButton#proceedButton, .QPushButton#deleteProfileButton, .QPushButton#acceptButton, .QPushButton#rejectButton, .QPushButton#addBlockButton, .QPushButton#removeBlockButton{
 	background-color: #fdb302;
-	font-family: Courier;
+	font-family: Courier New;
 }
 .QCheckBox#defaultCheckBox{
 	background-color: #fdb302;
-	font-family: Courier;
+	font-family: Courier New;
 	selection-background-color: gray;
 }
 .ConfirmDeleteDialog{
 	background-color: #fdb302;
-	font-family: Courier;
+	font-family: Courier New;
 }
 .AddFriendDialog{
 	background-color: #fdb302;
-	font-family: Courier;
+	font-family: Courier New;
+}
+.AddBlockedDialog{
+	background-color: #fdb302;
+	font-family: Courier New;
+}
+.BlockedDialog{
+	background-color: #fdb302;
+	font-family: Courier New;
+}
+.QListWidget#blockedList{
+	background-color: black;
+	border: 2px solid yellow;
+}
+.QListWidget::item{
+	color: white;
 }
 .QLineEdit#addChumInput{
 	background-color: #fdb302;
@@ -238,5 +258,5 @@
 }
 .InvalidUserDialog{
 	background-color: #fdb302;
-	font-family: Courier;
+	font-family: Courier New;
 }

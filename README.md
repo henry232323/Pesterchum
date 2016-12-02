@@ -17,4 +17,5 @@ Pictures borrowed from illuminatedWax's version found [here](https://github.com/
 - Add Memos
 - Regularize custom themes
 - Maybe recreate some themes?
-
+- Remove friend
+- Add context menus

@@ -1,4 +1,4 @@
-import re
+import re, os
 from datetime import datetime
 
 def process_send_msg(app, msg, user=None):
@@ -22,19 +22,23 @@ def process_received_msg(app, msg):
         app.client.send(nmsg)
     #If current user is in GETMOOD command, 
     elif ("GETMOOD" in msg) and (app.nick in msg):
-        process_send_msg("MOOD >{}".format(app.moods.value))
+        process_send_msg(app, "MOOD >{}".format(app.moods.value))
     #If PRIVMSG format, check for commands / for us 
     elif msg.startswith(":") and ("PRIVMSG" in msg):
         #Parse user
         usergp = re.match(r"(:.*)(?=!)", msg)
         if usergp:
             user = usergp.group(0)[1:]
+        else:
+            return
+        if user in app.blocked:
+            return
         #Check if message is for us
         exp = r"PRIVMSG {} :(.*)(?=:PESTERCHUM)*".format(app.nick)
         msggp = re.search(exp, msg)
         if msggp:
             pm = msggp.group(0)[10+len(app.nick):]
-            #If user color message, parse message and set that users color
+            #If color message, parse message and set that users color
             if "COLOR >" in pm:
                 colors = pm.strip("COLOR >").split(",")
                 colors = list(map(int,map(str.strip, colors)))
@@ -78,16 +82,24 @@ def fmt_cease_msg(app, fromuser, touser):
     '''Format a PM cease message'''
     msg = "/me ceased pestering {touser} {toInit} at {time}".format(touser=touser, toInit=getInitials(app, touser, c=True), time=getTime(app))
     return fmt_me_msg(app, msg, fromuser)
-    
-def fmt_me_msg(app, msg, user):
+
+def fmt_mood_msg(app, mood, user):
+    fmt = "/me changed their mood to {} {}"
+    path = os.path.join(app.theme["path"], mood.lower() + ".png")
+    img = fmt_img(path)
+    msg = fmt.format(mood.upper(), img)
+    return fmt_me_msg(app, msg, user)
+
+def fmt_me_msg(app, msg, user, time=False):
     '''Format a /me style message i.e.  -- ghostDunk's [GD'S] cat says hi -- (/me's cat says hi)'''
     me = msg.split()[0]
     suffix = me[3:]
     init = getInitials(app, user, c=True, suffix=suffix)
     predicate = msg[3+len(suffix):].strip()
-    fmt = '<span style="color:#646464;font-weight:bold;font-size:12px;">-- {user}{suffix} {init} {predicate}--</span><br />'
+    timefmt = '<span style="color:black;">[{}]</style>'.format(getTime(app)) if time else ""
+    fmt = '<b>{timefmt}<span style="color:#646464;"> -- {user}{suffix} {init} {predicate}--</span></b><br />'
     msg = fmt.format(user=user, init=getInitials(app, user, c=True),
-                     time=getTime(app),predicate=predicate, suffix=suffix)
+                     timefmt=timefmt, predicate=predicate, suffix=suffix)
     return msg
 
 def fmt_disp_msg(app, msg, user=None):
@@ -106,20 +118,23 @@ def fmt_disp_msg(app, msg, user=None):
         msg = None
     #If /me message, use fmt_me_msg
     elif msg.startswith("/me"):
-        msg = fmt_me_msg(app, msg, user)
+        msg = fmt_me_msg(app, msg, user, time=True)
     #Otherwise convert <c> to <span> and format normally with initials etc
     else:
         msg = color_to_span(msg)
         time = getTime(app)
         init = getInitials(app, user, b=False)
         color = app.getColor(user)
-        fmt = '<span style="font-weight:bold;color:black;">[{time}] <span style="color:{color};">{init}: {msg}</span></span><br />'
+        fmt = '<b><span style="color:black;">[{time}] <span style="color:{color};">{init}: {msg}</span></span></b><br />'
         msg = fmt.format(time=time,init=init,msg=msg.strip(),color=color)
     return msg
 
+def fmt_img(src):
+    return '<img src="{}" />'.format(src)
+
 def fmt_color(color):
     '''Format a color message'''
-    if type(color) == tuple:  
+    if type(color) == tuple:
         return "COLOR >{},{},{}".format(*color)
     else:
         return "COLOR >{},{},{}".format(*rgb(color, type=tuple))
