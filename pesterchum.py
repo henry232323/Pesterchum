@@ -106,6 +106,7 @@ class App(QApplication):
         process_send_msg(self, msg, user=user)
 
     def msg_received(self, msg):
+        print(msg)
         #Process a received message
         process_received_msg(self, msg)
 
@@ -138,6 +139,17 @@ class App(QApplication):
         self.gui.chumsTree.addTopLevelItem(treeitem)
         self.getFriendMood(user)
 
+    def remove_friend(self, user, item=None):
+        #Called via the Context menu (gui.remove_chum) in chumsTree
+        if user in self.friends.keys():
+            if item:
+                index = self.gui.chumsTree.indexOfTopLevelItem(item)
+                self.gui.chumsTree.takeTopLevelItem(index)
+            else:
+                index = self.gui.chumsTree.indexOfTopLevelItem(self.app.gui.getFriendItem(user)[0])
+                self.gui.chumsTree.takeTopLevelItem(index)
+            del self.friends[user]
+
     def send_begin(self, user):
         #Send target user the begin PM command
         self.send_msg("PESTERCHUM:BEGIN", user=user)
@@ -169,11 +181,15 @@ class App(QApplication):
         self.blocked.append(user)
 
     def toggle_idle(self):
-        self.idle = True
-        if self.gui.tabWindow:
-            for user in tabWindow:
-                self.process_send_msg("PESTERCHUM:IDLE")
-                
+        self.idle = not self.idle
+        if self.idle and self.gui.tabWindow:
+            for user in self.gui.tabWindow.users:
+                process_send_msg(self, "PESTERCHUM:IDLE", user=user)
+                try:
+                    tab = self.gui.start_privmsg(user)
+                    tab.display_text(fmt_me_msg(self, "/me is now idle chum!", user=self.nick))
+                except Exception as e:
+                    print(e)
         
     def join(self):
         #Called once the MODE keyword is seen in received messages

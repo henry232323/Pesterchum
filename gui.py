@@ -47,7 +47,6 @@ class Gui(QMainWindow):
         self.profileMenu = self.menubar.addMenu("Profile")
         self.helpMenu = self.menubar.addMenu("Help")
 
-
         #Create IDLE button in 'CLIENT' menu
         self.idleAction = QAction("IDLE", self)
         self.idleAction.setCheckable(True)
@@ -73,6 +72,14 @@ class Gui(QMainWindow):
         self.openSwitch = QAction("SWITCH", self)
         self.openSwitch.triggered.connect(self.openSwitchDialog)
         self.profileMenu.addAction(self.openSwitch)
+
+        #Create REMOVE CHUM button in Chum Context menu
+        self.removeFriendContext = QAction("REMOVE CHUM")
+        self.removeFriendContext.triggered.connect(self.remove_chum)
+
+        #Create BLOCK button in Chum Context menu
+        self.removeFriendContext = QAction("BLOCK")
+        self.removeFriendContext.triggered.connect(self.block_selected)
 
         #Make dictionary of all current mood buttons, manual for now
         self.mood_buttons = {self.chummyButton.text():self.chummyButton,
@@ -101,6 +108,9 @@ class Gui(QMainWindow):
             treeitem.setIcon(0, QIcon(self.theme["path"] + "/offline.png"))
             self.chumsTree.addTopLevelItem(treeitem)
 
+        self.chumsTree.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.chumsTree.customContextMenuRequested.connect(self.openChumsMenu)
+
         #Open new private message on doubleclick
         self.chumsTree.itemDoubleClicked.connect(self.open_privmsg)
         self.pesterButton.clicked.connect(self.privmsg_pester)
@@ -122,6 +132,21 @@ class Gui(QMainWindow):
 
     def openBlockedDialog(self):
         self.blockedDialog = BlockedDialog(self.app, self)
+
+    def openChumsMenu(self, position):
+        indexes = self.chumsTree.selectedIndexes()
+        if indexes:
+            menu = QMenu()
+            menu.addAction(self.removeFriendContext)
+            menu.exec_(self.chumsTree.viewport().mapToGlobal(position))
+
+    def remove_chum(self):
+        items = self.chumsTree.selectedItems()
+        if items:
+            user = items[0].text(0)
+            item = items[0]
+            self.app.remove_friend(user, item=item)
+        
             
     def start_privmsg(self, user):
         '''
@@ -155,9 +180,11 @@ class Gui(QMainWindow):
         selected = self.chumsTree.selectedItems()
         if selected:
             user = selected[0].text(0)
+            if user in self.app.friends.keys():
+                if user not in self.app.blocked:
+                    index = self.app.gui.chumsTree.indexOfTopLevelItem(self.app.gui.getFriendItem(user)[0])
+                    self.app.gui.chumsTree.takeTopLevelItem(index)
             self.app.add_blocked(user)
-            self.chumsTree.removeItem(selected[0])
-
     def color_picker(self):
         '''Open color picker dialog, change current user color and change colorButton background'''
         color = QColorDialog.getColor()
