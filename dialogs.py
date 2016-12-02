@@ -206,10 +206,17 @@ class AddBlockedDialog(QDialog):
     def accepted(self):
         '''Call once accepted, check if name is alphanumeric if not warn and try again'''
         user = self.addChumInput.text()
-        if user:
+        if user and (user not in self.app.blocked):
             self.app.add_blocked(user)
             item = QListWidgetItem(user)
             self.parent.blockedList.addItem(item)
+            if user in self.app.friends.keys():
+                if user not in self.app.blocked:
+                    index = self.app.gui.chumsTree.indexOfTopLevelItem(self.app.gui.getFriendItem(user)[0])
+                    self.app.gui.chumsTree.takeTopLevelItem(index)
+
+            self.close()
+        else:
             self.close()
 
 class InvalidUserDialog(QDialog):
@@ -238,6 +245,8 @@ class BlockedDialog(QDialog):
         self.setWindowIcon(QIcon("resources/pc_chummy.png"))
         self.addBlockButton.clicked.connect(self.add)
         self.removeBlockButton.clicked.connect(self.remove)
+        for user in self.app.blocked:
+            self.blockedList.addItem(QListWidgetItem(user))
         self.exec_()
 
     def add(self):
@@ -253,6 +262,9 @@ class BlockedDialog(QDialog):
                 user = item.text()
                 self.app.blocked.remove(user)
                 if user in self.app.friends.keys():
-                    self.app.gui.chumsTree.addItem(QTreeWidgetItem(user, 0))
+                    treeitem = QTreeWidgetItem()
+                    treeitem.setText(0, user)
+                    treeitem.setIcon(0, QIcon(self.app.theme["path"] + "/offline.png"))
+                    self.app.gui.chumsTree.addTopLevelItem(treeitem)
         except Exception as e:
             print(e)

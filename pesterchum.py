@@ -21,6 +21,7 @@ class App(QApplication):
         self.loop = loop 
         asyncio.set_event_loop(loop)
         self.connected = False #Set Connection state
+        self.idle = False
 
         #Initialize config and moods
         self.config = Config 
@@ -166,6 +167,13 @@ class App(QApplication):
 
     def add_blocked(self, user):
         self.blocked.append(user)
+
+    def toggle_idle(self):
+        self.idle = True
+        if self.gui.tabWindow:
+            for user in tabWindow:
+                self.process_send_msg("PESTERCHUM:IDLE")
+                
         
     def join(self):
         #Called once the MODE keyword is seen in received messages
