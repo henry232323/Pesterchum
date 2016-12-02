@@ -211,9 +211,8 @@ class AddBlockedDialog(QDialog):
             item = QListWidgetItem(user)
             self.parent.blockedList.addItem(item)
             if user in self.app.friends.keys():
-                if user not in self.app.blocked:
-                    index = self.app.gui.chumsTree.indexOfTopLevelItem(self.app.gui.getFriendItem(user)[0])
-                    self.app.gui.chumsTree.takeTopLevelItem(index)
+                index = self.app.gui.chumsTree.indexOfTopLevelItem(self.app.gui.getFriendItem(user)[0])
+                self.app.gui.chumsTree.takeTopLevelItem(index)
 
             self.close()
         else:
