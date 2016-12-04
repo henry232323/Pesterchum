@@ -9,60 +9,59 @@ def process_send_msg(app, msg, user=None):
     else:
         app.client.send(msg + "\r\n")
 
+def parse_message(s):
+    """Breaks a message from an IRC server into its prefix, command, and arguments.
+    """
+    prefix = ''
+    trailing = []
+    if not s:
+       return
+    if s[0] == ':':
+        prefix, s = s[1:].split(' ', 1)
+        prefix = prefix.split("!")[0]
+    if s.find(' :') != -1:
+        s, trailing = s.split(' :', 1)
+        args = s.split()
+        args.append(trailing)
+    else:
+        args = s.split()
+    command = args.pop(0)
+    return prefix, command, args            
+        
 def process_received_msg(app, msg):
-    '''
-    Process a message received
-    '''
-    #If mode in message, send JOIN #pesterchum message
-    if ("MODE" in msg) and not app.connected:
+    parse = parse_message(msg)
+    if not parse:
+        return
+    user, command, args = parse
+    #If command is MODE, JOIN #pesterchum
+    if command == "MODE" and not app.connected:
         app.join()
-    #If ping message, return pong conjugate
-    elif msg.startswith("PING"):
-        nmsg = msg.replace("PING", "PONG")
-        app.client.send(nmsg)
-    #If current user is in GETMOOD command, 
-    elif ("GETMOOD" in msg) and (app.nick in msg):
-        process_send_msg(app, "MOOD >{}".format(app.moods.value))
-    #If PRIVMSG format, check for commands / for us 
-    elif msg.startswith(":") and ("PRIVMSG" in msg):
-        #Parse user
-        usergp = re.match(r"(:.*)(?=!)", msg)
-        if usergp:
-            user = usergp.group(0)[1:]
-        else:
-            return
+    #If command is PING, return PONG conjugate
+    elif command == "PING":
+        send = "PONG :{}\r\n".format(args[0])
+        app.client.send(send)
+    #If PRIVMSG, check for commands / PMs to us
+    elif command == "PRIVMSG":
+        channel = args[-2]
+        message = args[-1]
+        #If blocked, just return
         if user in app.blocked:
             return
-        #Check if message is for us
-        exp = r"PRIVMSG {} :(.*)(?=:PESTERCHUM)*".format(app.nick)
-        msggp = re.search(exp, msg)
-        if msggp:
-            pm = msggp.group(0)[10+len(app.nick):]
-            #If color message, parse message and set that users color
-            if "COLOR >" in pm:
-                colors = pm.strip("COLOR >").split(",")
+        #If a GETMOOD message to #pesterchum (not a PM with GETMOOD in it) send our mood
+        if (channel == "#pesterchum") and ("GETMOOD" in msg) and (app.nick in msg):
+            process_send_msg(app, "MOOD >{}".format(app.moods.value), user="#pesterchum")
+        #If a PM to us, display message / check if COLOR command
+        if channel == app.nick:
+            #If COLOR command, parse and set that user's color
+            if "COLOR >" in message:
+                colors = message.strip("COLOR >").split(",")
                 colors = list(map(int,map(str.strip, colors)))
                 app.setColor(user, rgbtohex(*colors))
             else:
-                #Format the message like a regular message
-                pm = fmt_disp_msg(app, pm, user=user)
-                #Display formatted message
-                if pm:
-                    app.pm_received(pm, user)
+                fmt = fmt_disp_msg(app, message, user=user)
+                if fmt:
+                    app.pm_received(fmt, user)
                     
-        #If not PM for us, check if its a MOOD message from someone we care about
-        else:
-            exp = r"(?<=PRIVMSG #pesterchum :MOOD >)(.*)(?=\r\n)*".format(app.nick)
-            mood = re.search(exp, msg)
-            #If it is a mood, parse
-            if mood:
-                mood = mood.group(0).strip()
-                mood = int(mood.strip())
-                #If its a friend, set that users mood
-                if user in app.friends.keys():
-                    app.changeUserMood(user, mood)
-        
-
 def color_to_span(msg):
     '''Convert <c=#hex> codes to <span style="color:"> codes'''
     exp = r'<c=(.*?)>(.*?)</c>'
