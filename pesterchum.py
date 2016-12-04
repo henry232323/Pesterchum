@@ -106,9 +106,12 @@ class App(QApplication):
         process_send_msg(self, msg, user=user)
 
     def msg_received(self, msg):
-        print(msg)
         #Process a received message
-        process_received_msg(self, msg)
+        messages = msg.split("\r\n")
+        for message in messages:
+            if message:
+                print(message)
+                process_received_msg(self, message)
 
     def pm_received(self, msg, user):
         #Display processed message, called by process_received_msg
