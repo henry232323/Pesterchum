@@ -220,6 +220,7 @@ class App(QApplication):
     def exit(self):
         #Called when exiting the client
         #Save configurations and sys.exit
+        self.client.send("QUIT :Disconnected\r\n")
         with open("resources/config.json", 'w') as config:
             self.config["friends"] = self.friends
             self.config["users"] = self.users

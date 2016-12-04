@@ -20,8 +20,10 @@ class PrivateMessageWidget(QWidget):
         self.user = user
         self.app = app
         self.userLabel.setText(user.join(["::", "::"]))
-        self.userOutput.setEnabled(False)
+        #self.userOutput.setEnabled(False)
         self.sendButton.clicked.connect(self.send)
+        self.userOutput.setReadOnly(True)
+        self.userOutput.setMouseTracking(True)
         self.display_text(fmt_begin_msg(app, self.app.nick, user))
         
     def send(self):
@@ -36,6 +38,9 @@ class PrivateMessageWidget(QWidget):
 
     def display_text(self, msg):
         '''Insert msg into the display box'''
+        cursor = self.userOutput.textCursor()
+        cursor.movePosition(QTextCursor.End)
+        self.userOutput.setTextCursor(cursor)
         self.userOutput.insertHtml(msg)
 
     def keyPressEvent(self, event):
@@ -77,7 +82,8 @@ class TabWindow(QWidget):
         if not user in self.users:
             windw = PrivateMessageWidget(self.app, self.tabWidget, self, user)
             self.app.send_begin(user)
-            a = self.tabWidget.addTab(windw, user)
+            icon = QIcon("resources/pc_chummy.png")
+            a = self.tabWidget.addTab(windw, icon, user)
             tab = self.tabWidget.widget(a)
             tab.setStyleSheet(self.app.theme["styles"])
             self.users.append(user)

@@ -33,6 +33,9 @@ def process_received_msg(app, msg):
     if not parse:
         return
     user, command, args = parse
+    #If just a echoed message, pass
+    if user == app.nick:
+        return
     #If command is MODE, JOIN #pesterchum
     if command == "MODE" and not app.connected:
         app.join()
@@ -40,6 +43,14 @@ def process_received_msg(app, msg):
     elif command == "PING":
         send = "PONG :{}\r\n".format(args[0])
         app.client.send(send)
+    #Check for connecting friend
+    elif command == "JOIN":
+        if user in app.friends.keys():
+            app.changeUserMood(user, 1)
+    #Check for disconnecting friend
+    elif command == "QUIT":
+        if user in app.friends.keys():
+            app.changeUserMood(user, "OFFLINE")
     #If PRIVMSG, check for commands / PMs to us
     elif command == "PRIVMSG":
         channel = args[-2]
