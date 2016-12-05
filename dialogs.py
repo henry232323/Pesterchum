@@ -4,6 +4,7 @@ from PyQt5.QtCore import Qt, pyqtSlot
 from PyQt5 import uic
 
 import os.path, json
+from types import MethodType
 
 from themes import *
 from messages import *
@@ -20,7 +21,6 @@ class PrivateMessageWidget(QWidget):
         self.user = user
         self.app = app
         self.userLabel.setText(user.join(["::", "::"]))
-        #self.userOutput.setEnabled(False)
         self.sendButton.clicked.connect(self.send)
         self.userOutput.setReadOnly(True)
         self.userOutput.setMouseTracking(True)
@@ -62,16 +62,27 @@ class TabWindow(QWidget):
         self.init_user = self.add_user(user)
         self.tabWidget.removeTab(0)#Remove two default tabs
         self.tabWidget.removeTab(0)
+        self.tabWidget.setTabsClosable(True)
+        self.tabWidget.tabCloseRequested.connect(self.closeTab)
         self.setWindowTitle("Private Message")
         self.setWindowIcon(QIcon("resources/pc_chummy.png"))
         self.show()
+
+    def closeTab(self, currentIndex):
+        widget = self.tabWidget.widget(currentIndex)
+        widget.deleteLater()
+        self.tabWidget.removeTab(currentIndex)
+        self.app.send_cease(widget.user)
+        self.users.remove(widget.user)
+        if not self.users:
+            self.close()
 
     def closeEvent(self, event):
         '''On window (or tab) close send a PESTERCHUM:CEASE message to each user, destroy self'''
         self.app.tabWindow = None
         for user in self.users:
             self.app.send_cease(user)
-        self.destroy()
+        event.accept()
         
     def add_user(self, user):
         '''
