@@ -22,6 +22,8 @@ class App(QApplication):
         asyncio.set_event_loop(loop)
         self.connected = False #Set Connection state
         self.idle = False
+        self.names_list = dict()
+        self.online = []
 
         #Initialize config and moods
         self.config = Config 
@@ -95,7 +97,10 @@ class App(QApplication):
     def getFriendsMoods(self):
         #Called on connection, use GETMOOD command in #pesterchum
         #To request moods of users
-        self.send_msg("GETMOOD {}".format("".join(self.friends.keys())), user="#pesterchum")
+        online = set(self.friends.keys()).intersection(self.names_list["#pesterchum"])
+        self.online.extend(online)
+        msg = "GETMOOD {}".format("".join(online))
+        self.send_msg(msg, user="#pesterchum")
 
     def getFriendMood(self, user):
         #Get a friend's mood
@@ -110,7 +115,6 @@ class App(QApplication):
         messages = msg.split("\r\n")
         for message in messages:
             if message:
-                print(message)
                 process_received_msg(self, message)
 
     def pm_received(self, msg, user):
@@ -166,6 +170,7 @@ class App(QApplication):
         #A little glitchy
         #Restart connection on connection lost
         print("Connection lost")
+        self.connected = False
         self.client.transport.close()
         self.client = Client(self.loop, self.gui, self)
         coro = self.loop.create_connection(lambda: self.client, self.host, self.port)
@@ -201,7 +206,6 @@ class App(QApplication):
         join = "JOIN #pesterchum\r\n"
         self.client.send(join)
         self.connected = True
-        self.getFriendsMoods()
 
     def getColor(self, user):
         #Get a user's COLOR
