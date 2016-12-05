@@ -1,6 +1,6 @@
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import QIcon, QFont, QTextCursor, QColor
-from PyQt5.QtCore import Qt
+from PyQt5.QtCore import Qt, pyqtSignal
 from quamash import QEventLoop
 
 import asyncio, sys, os.path, json, re
@@ -169,8 +169,8 @@ class App(QApplication):
     def connection_lost(self, exc):
         #A little glitchy
         #Restart connection on connection lost
-        print("Connection lost")
         self.connected = False
+        self.client.send("QUIT :Disconnected\r\n")
         self.client.transport.close()
         self.client = Client(self.loop, self.gui, self)
         coro = self.loop.create_connection(lambda: self.client, self.host, self.port)
@@ -184,6 +184,9 @@ class App(QApplication):
         self.client.send(user)
         for user in self.userlist.keys():
                 self.send_msg(fmt_color(self.color), user=user)
+
+    def reconnect(self):
+        pass
 
     def add_blocked(self, user):
         self.blocked.append(user)

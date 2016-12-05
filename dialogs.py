@@ -3,7 +3,7 @@ from PyQt5.QtGui import QIcon, QFont, QTextCursor, QPixmap, QColor
 from PyQt5.QtCore import Qt, pyqtSlot
 from PyQt5 import uic
 
-import os.path, json
+import os.path, json, sys
 from types import MethodType
 
 from themes import *
@@ -284,3 +284,40 @@ class BlockedDialog(QDialog):
                     self.app.gui.chumsTree.addTopLevelItem(treeitem)
         except Exception as e:
             print(e)
+
+class ConnectingDialog(QDialog):
+    def __init__(self, app, parent):
+        super(__class__, self).__init__()
+        uic.loadUi(app.theme["ui_path"] + "/ConnectingDialog.ui", self)
+        self.app = app
+        self.parent = parent
+        self.setWindowFlags(Qt.FramelessWindowHint)
+        self.connectingExitButton.clicked.connect(sys.exit)
+        self.setWindowTitle('Connecting')
+        self.setWindowIcon(QIcon("resources/pc_chummy.png"))
+        self.app.gui.connectingDialog = self
+        width = self.frameGeometry().width()
+        height = self.frameGeometry().height()
+        self.setFixedSize(width, height)
+
+        self.exec_()
+
+class UserlistWindow(QWidget):
+    def __init__(self, app, parent):
+        super(__class__, self).__init__()
+        uic.loadUi(app.theme["ui_path"] + "/UserlistWindow.ui", self)
+        self.app = app
+        self.parent = parent
+        self.closeUserlist.clicked.connect(self.close)
+        self.setWindowTitle('Userlist')
+        self.setWindowIcon(QIcon("resources/pc_chummy.png"))
+
+        width = self.frameGeometry().width()
+        height = self.frameGeometry().height()
+        self.setFixedSize(width, height)
+
+        self.userList.setSortingEnabled(True)
+        self.userList.addItems(self.app.names_list["#pesterchum"])
+        self.userList.itemDoubleClicked.connect(self.app.gui.open_privmsg_userlist)
+        
+        self.show()

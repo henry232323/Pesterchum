@@ -36,7 +36,15 @@
 	border-style: solid;
 	border-width: 3px;
 	font-family: Courier New;
-	selection-background-color: gray;
+}
+.QTreeWidget::item{
+	color: white;
+}
+.QTreeWidget::item::selected, .QTreeWidget::item::selected::hover{
+	background-color: gray;
+}
+.QTreeWidget::item::hover{
+	background-color: rgb(200,200,200,50);
 }
 .QPushButton#addChumButton{
 	text-align: center;
@@ -222,7 +230,11 @@
 	background-color: #fdb302;
 	font-family: Courier New;
 }
-.QPushButton#cancelButton, .QPushButton#proceedButton, .QPushButton#deleteProfileButton, .QPushButton#acceptButton, .QPushButton#rejectButton, .QPushButton#addBlockButton, .QPushButton#removeBlockButton{
+.QPushButton#cancelButton, .QPushButton#proceedButton,
+.QPushButton#deleteProfileButton,
+.QPushButton#acceptButton, .QPushButton#rejectButton,
+.QPushButton#addBlockButton, .QPushButton#removeBlockButton,
+.QPushButton#closeUserlist, .QPushButton#connectingExitButton{
 	background-color: #fdb302;
 	font-family: Courier New;
 }
@@ -247,12 +259,18 @@
 	background-color: #fdb302;
 	font-family: Courier New;
 }
-.QListWidget#blockedList{
+.QListWidget#blockedList, .QListWidget#userList{
 	background-color: black;
 	border: 2px solid yellow;
 }
 .QListWidget::item{
 	color: white;
+}
+.QListWidget::item::selected, .QListWidget::item::selected::hover{
+	background-color: gray;
+}
+.QListWidget::item::hover{
+	background-color: rgb(200,200,200,50);
 }
 .QLineEdit#addChumInput{
 	background-color: #fdb302;
@@ -260,6 +278,14 @@
 	selection-background-color: gray;
 }
 .InvalidUserDialog{
+	background-color: #fdb302;
+	font-family: Courier New;
+}
+.ConnectingDialog{
+	background-color: #fdb302;
+	font-family: Courier New;
+}
+.UserlistWindow{
 	background-color: #fdb302;
 	font-family: Courier New;
 }

@@ -36,7 +36,7 @@ def privmsg(app, parse):
     message = args[-1]
     #If a GETMOOD message to #pesterchum (not a PM with GETMOOD in it) send our mood
     if (channel == "#pesterchum") and ("GETMOOD" in args[-1]) and (app.nick in args[-1]):
-        app.send_msg(app, "MOOD >{}".format(app.moods.value), user="#pesterchum")
+        app.send_msg("MOOD >{}".format(app.moods.value), user="#pesterchum")
     #Check for MOOD message from someone we know
     if (channel == "#pesterchum") and (user in app.online) and "MOOD" in args[-1]:
         exp = r"(?<=MOOD >)(.*)(?=\r\n)*".format(app.nick)
@@ -74,6 +74,7 @@ def end_names(app, parse):
     user, command, args = parse
     if args[-2] == "#pesterchum":
         app.getFriendsMoods()
+    
     
 command_list = ["PING",
                 "JOIN",

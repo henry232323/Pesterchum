@@ -4,6 +4,8 @@ from PyQt5.QtCore import Qt, pyqtSlot
 from PyQt5 import uic
 
 import os.path, json
+import asyncio
+from asyncio import async as aioasync
 
 from themes import *
 from messages import *
@@ -18,6 +20,7 @@ class Gui(QMainWindow):
         self.friends = self.app.friends
         self.color = self.app.color
         self.theme = self.app.theme
+        self.connectingDialog = None
 
     def initialize(self):
         '''Initialize GUI creation'''
@@ -47,11 +50,21 @@ class Gui(QMainWindow):
         self.profileMenu = self.menubar.addMenu("Profile")
         self.helpMenu = self.menubar.addMenu("Help")
 
+        #Create USERLIST button in 'CLIENT' menu
+        self.userlistAction = QAction("USERLIST",self)
+        self.userlistAction.triggered.connect(self.openUserList)
+        self.clientMenu.addAction(self.userlistAction)
+
         #Create IDLE button in 'CLIENT' menu
         self.idleAction = QAction("IDLE", self)
         self.idleAction.setCheckable(True)
         self.idleAction.toggled.connect(self.app.toggle_idle)
         self.clientMenu.addAction(self.idleAction)
+
+        #Create RECONNECT button in 'CLIENT' menu
+        self.reconnectClient = QAction("RECONNECT",self)
+        self.reconnectClient.triggered.connect(self.app.reconnect)
+        self.clientMenu.addAction(self.reconnectClient)
 
         #Create EXIT button in 'CLIENT' menu
         self.exitClient = QAction("EXIT",self)
@@ -140,13 +153,23 @@ class Gui(QMainWindow):
             menu.addAction(self.removeFriendContext)
             menu.exec_(self.chumsTree.viewport().mapToGlobal(position))
 
+    def openUserList(self):
+        self.userList = UserlistWindow(self.app, self)
+
+    async def openReconnect(self):
+        self.connectingDialog = ConnectingDialog(self.app, self)
+
+    async def closeReconnect(self):
+        if self.connectingDialog:
+            self.connectingDialog.close()
+            self.connectingDialog = None
+
     def remove_chum(self):
         items = self.chumsTree.selectedItems()
         if items:
             user = items[0].text(0)
             item = items[0]
             self.app.remove_friend(user, item=item)
-        
             
     def start_privmsg(self, user):
         '''
@@ -162,6 +185,13 @@ class Gui(QMainWindow):
     @pyqtSlot(QTreeWidgetItem)
     def open_privmsg(self, item):
         user = item.text(0)
+        self.start_privmsg(user)
+        self.tabWindow.raise_()
+        self.tabWindow.activateWindow()
+
+    @pyqtSlot(QListWidgetItem)
+    def open_privmsg_userlist(self, item):
+        user = item.text()
         self.start_privmsg(user)
         self.tabWindow.raise_()
         self.tabWindow.activateWindow()

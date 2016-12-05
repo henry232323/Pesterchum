@@ -17,3 +17,4 @@ Pictures borrowed from illuminatedWax's version found [here](https://github.com/
 - Add Memos
 - Regularize custom themes
 - Maybe recreate some themes?
+- Quirks!
