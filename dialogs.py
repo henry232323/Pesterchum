@@ -79,10 +79,10 @@ class TabWindow(QWidget):
 
     def closeEvent(self, event):
         '''On window (or tab) close send a PESTERCHUM:CEASE message to each user, destroy self'''
-        self.app.tabWindow = None
         for user in self.users:
             self.app.send_cease(user)
         event.accept()
+        self.app.gui.tabWindow = None
         
     def add_user(self, user):
         '''
