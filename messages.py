@@ -12,6 +12,8 @@ def process_send_msg(app, msg, user=None):
 def parse_message(s):
     """Breaks a message from an IRC server into its prefix, command, and arguments.
     """
+    if len(s.split()) == 1:
+        return
     prefix = ''
     trailing = []
     if not s:
@@ -26,7 +28,7 @@ def parse_message(s):
     else:
         args = s.split()
     command = args.pop(0)
-    return prefix, command, args            
+    return prefix, command, args
         
 def process_received_msg(app, msg):
     parse = parse_message(msg)

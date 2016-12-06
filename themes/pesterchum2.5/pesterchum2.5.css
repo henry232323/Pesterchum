@@ -83,7 +83,7 @@
 	font-family: Courier New;
 	padding: 3px 0px 3px 2px;
 }
-.QPushButton[checkable="true"]{
+.Gui .QPushButton[checkable="true"]{
 	text-align: left;
 	background-color:yellow;
 	border-color:#BB8800;
@@ -93,7 +93,7 @@
 	font-family: Courier New;
 	font-size:11px;
 }
-.QPushButton[checkable="true"]::checked{
+.Gui .QPushButton[checkable="true"]::checked{
 	text-align: left;
 	background-color:white;
 	border-color:#BB8800;
@@ -220,12 +220,12 @@
 .QLabel#chooseProfileLabel{
 	font-family: Courier New;
 }
-.QComboBox#profilesDropdown{
+.QComboBox{
 	background-color: #fdb302;
 	selection-background-color: gray;
 	font-family: Courier New;
 }
-.QComboBox#profilesDropdown QAbstractItemView {
+.QComboBox QAbstractItemView {
 	selection-background-color: gray;
 	background-color: #fdb302;
 	font-family: Courier New;
@@ -287,5 +287,16 @@
 }
 .UserlistWindow{
 	background-color: #fdb302;
+	font-family: Courier New;
+}
+.OptionsWindow{
+	background-color: #fdb302;
+	font-family: Courier New;
+}
+.OptionsWindow .QPushButton[checkable="true"]{
+	background-color: #fdb302;
+	font-family: Courier New;
+}
+.OptionsWindow .QPushButton[checkable="true"]::selected{
 	font-family: Courier New;
 }

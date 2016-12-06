@@ -321,3 +321,72 @@ class UserlistWindow(QWidget):
         self.userList.itemDoubleClicked.connect(self.app.gui.open_privmsg_userlist)
         
         self.show()
+
+class OptionsWindow(QWidget):
+    def __init__(self, app, parent):
+        try:
+            super(__class__, self).__init__()
+            uic.loadUi(app.theme["ui_path"] + "/OptionsWindow.ui", self)    
+            self.app = app
+            self.parent = parent
+            self.setWindowTitle('Userlist')
+            self.setWindowIcon(QIcon("resources/pc_chummy.png"))
+            self.options = self.app.options
+
+            width = self.frameGeometry().width()
+            height = self.frameGeometry().height()
+            self.setFixedSize(width, height)
+            self.buttons = (self.optionsButton1,self.optionsButton2,self.optionsButton3,self.optionsButton4,
+                            self.optionsButton5,self.optionsButton6,self.optionsButton7,self.optionsButton8)
+
+            for index, button in enumerate(self.buttons):
+                button.clicked.connect(self.make_call(index, button))
+                
+            self.acceptButton.clicked.connect(self.saveConfig)
+            self.rejectButton.clicked.connect(self.close)
+            self.themesComboBox.addItems(self.app.themes.keys())
+            self.refreshThemeButton.clicked.connect(lambda: self.app.change_theme(self.app.theme_name))
+
+            convo_opt = self.options["conversations"]
+            chum_opt = self.options["chum_list"]
+            interface_opt = self.options["interface"]
+            
+            #Chum List
+            self.hideOfflineRadio.setChecked(chum_opt["hide_offline_chums"])
+            self.showEmptyRadio.setChecked(chum_opt["show_empty_groups"])
+            self.showNumberRadio.setChecked(chum_opt["show_number_of_online_chums"])
+            self.sortChumsCombo.addItems(("Alphabetically", "Mood"))
+            self.sortChumsCombo.setCurrentIndex(chum_opt["sort_chums"])
+            self.lowBandwidthRadio.setChecked(chum_opt["low_bandwidth"])
+            #Conversations
+            self.timeStampsRadio.setChecked(convo_opt["time_stamps"])
+            self.showSecondsRadio.setChecked(convo_opt["show_seconds"])
+            self.opVoiceMemoRadio.setChecked(convo_opt["op_and_voice_in_memos"])
+            self.animatedSmiliesRadio.setChecked(convo_opt["use_animated_smilies"])
+            self.randomEncountersRadio.setChecked(convo_opt["receive_random_encounters"])
+            self.clockTypeComboBox.addItems(('12','24'))
+            self.clockTypeComboBox.setCurrentIndex(convo_opt["clock_type"])
+            #Interface
+            
+
+            self.show()
+        except Exception as e:
+            print(e)
+    def saveConfig(self):
+        oldtheme = self.app.theme_name
+        try:
+            self.app.change_theme(self.themesComboBox.currentText())
+        except Exception as e:
+            self.errorLabel.setText("Error changing theme: \n{}".format(e))
+            self.app_change_theme(oldtheme)
+        self.close()
+
+    def make_call(self, index, button):
+        def setIndex():
+            self.stackedWidget.setCurrentIndex(index)
+            button.setChecked(True)
+            for Button in self.buttons:
+                if button != Button:
+                    Button.setChecked(False)
+                
+        return setIndex

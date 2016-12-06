@@ -1,0 +1,302 @@
+.Gui{
+	background-color: #FFB500;
+	border-image: url($path/tnbg.png);
+}
+.QLabel#appLabel{
+	color: white;
+	font-size: 20px;
+	padding: 5px;
+	font-family: Arial;
+	font-weight: bold;
+}
+.QMenuBar#menubar{
+	color: black;
+	font-weight: bold;
+	font-family: Arial;
+	background-color: transparent;
+	selection-background-color: transparent;
+}
+.QMenu{
+	color: black;
+	font-family: Arial;
+	background-color: #FFB500;
+	border-color:#FFA4A4;
+	border-style:solid;
+	border-width:2px;
+	left: -5px;
+	font-weight: bold;
+}
+.QMenu::item:selected{
+	background-color: #FFA4A4;
+}
+.QTreeWidget#chumsTree{
+	background-color: black;
+	color:#666;
+	border-color: #FFFF00;
+	border-style: solid;
+	border-width: 3px;
+	font-family: Arial;
+}
+.QTreeWidget::item{
+	color: white;
+}
+.QTreeWidget::item::selected, .QTreeWidget::item::selected::hover{
+	background-color: gray;
+}
+.QTreeWidget::item::hover{
+	background-color: rgb(200,200,200,50);
+}
+.QPushButton#addChumButton{
+	text-align: center;
+	background-color:#FFA4A4;
+	border-color:#780000;
+	border-style:solid;
+	border-width:2px;
+	font-family: Arial;
+	padding: 5px 0px 5px 0px;
+}
+.QPushButton#pesterButton{
+	text-align: center;
+	background-color:#FFA4A4;
+	border-color:#780000;
+	border-style:solid;
+	border-width:2px;
+	font-family: Arial;
+	padding: 5px 0px 5px 0px;
+}
+.QPushButton#blockButton{
+	text-align: center;
+	background-color:#FFA4A4;
+	border-color:#780000;
+	border-style:solid;
+	border-width:2px;
+	font-family: Arial;
+	padding: 5px 0px 5px 0px;
+}
+.QPushButton#nameButton{
+	background-color: black;
+	color:white;
+	text-align: left;
+	border-color: #FFFF00;
+	border-style: solid;
+	border-width: 2px;
+	font-family: Arial;
+	padding: 3px 0px 3px 2px;
+}
+.Gui .QPushButton[checkable="true"]{
+	text-align: left;
+	background-color:#FFA4A4;
+	border-color:#780000;
+	border-style:solid;
+	border-width:2px;
+	padding: 5px 0px 5px 0px;
+	font-family: Arial;
+	font-size:11px;
+}
+.Gui .QPushButton[checkable="true"]::checked{
+	text-align: left;
+	background-color:white;
+	border-color:#780000;
+	border-style:solid;
+	border-width:2px;
+	padding: 5px 0px 5px 0px;
+	font-family: Arial;
+	font-size:11px;
+}
+.QPushButton#rancorousButton{
+	text-align: left;
+	background-color:red;
+	border-color:#780000;
+	border-style:solid;
+	border-width:2px;
+	padding: 5px 0px 5px 0px;
+	font-family: Arial;
+}
+.QPushButton#rancorousButton::checked{
+	text-align: left;
+	background-color:white;
+	border-color:#780000;
+	border-style:solid;
+	border-width:2px;
+	padding: 5px 0px 5px 0px;
+	font-family: Arial;
+	color: red;
+}
+.QPushButton#abscondButton{
+	text-align: center;
+	background-color: black;
+	border-color:#780000;
+	border-style:solid;
+	border-width:2px;
+	padding: 5px 0px 5px 0px;
+	color: white;
+	font-family: Arial;
+}
+.QPushButton#abscondButton::checked{
+	text-align: center;
+	background-color:white;
+	border-color:#780000;
+	border-style:solid;
+	border-width:2px;
+	padding: 5px 0px 5px 0px;
+	font-family: Arial;
+	color: #CCCCCC;
+}
+.TabWindow{
+	background-color: #FFB500;
+	border-color: #FFFF00;
+	border-style: solid;
+	border-width: 2px;
+}
+.QTabWidget::pane {
+	background-color: #FFB500;
+	border-color: #FFFF00;
+	border-style: solid;
+	border-width: 2px;
+}
+.QTabBar::tab{
+	background-color: #7f7f7f;
+	font-family: 'Arial';
+	font:bold;
+	font-size:12px;
+	min-height:25px;
+}
+.QTabBar::tab::selected{
+	border:0px;
+	background-color:#E5000F;
+	border-top:2px solid #FFA4A4;
+	border-left:2px solid #FFA4A4;
+	border-right:2px solid #FFA4A4;
+	border-top-left-radius: 4px;
+	border-top-right-radius: 4px;
+}
+.PrivateMessageWidget{
+	background-color: #FFB500;
+	border-color: #FFFF00;
+	border-style: solid;
+	border-width: 2px;
+}
+.QLabel#userLabel{
+	padding: 13px 0px 13px 0px;
+	height:60px;
+	color:white;
+	background-color:#780000;
+	font-size: 15px;
+}
+.QTextEdit#userOutput{
+	border-color: #780000;
+	border-style: solid;
+	border-width: 2px;
+	font-size: 12px;
+	selection-background-color: gray;
+}
+.QLineEdit#userInput{
+	border-color: #780000;
+	border-style: solid;
+	border-width: 2px;
+	selection-background-color: gray;
+}
+.QPushButton#sendButton{
+	text-align: left;
+	background-color:#FFA4A4;
+	border-color:#780000;
+	border-style:solid;
+	border-width:2px;
+	padding: 3px 0px 3px 0px;
+	font-family: Arial;
+}
+.SwitchDialog{
+	background-color: #E5000F;
+	font-family: Arial;
+}
+.QLabel#chamhanelLabel{
+	font-family: Arial;
+}
+.QLineEdit#getHandleInput{
+	background-color: #E5000F;
+	border: 1px solid black;
+	selection-background-color: gray;
+}
+.QLabel#chooseProfileLabel{
+	font-family: Arial;
+}
+.QComboBox{
+	background-color: #E5000F;
+	selection-background-color: gray;
+	font-family: Arial;
+}
+.QComboBox QAbstractItemView {
+	selection-background-color: gray;
+	background-color: #E5000F;
+	font-family: Arial;
+}
+.QPushButton#cancelButton, .QPushButton#proceedButton,
+.QPushButton#deleteProfileButton,
+.QPushButton#acceptButton, .QPushButton#rejectButton,
+.QPushButton#addBlockButton, .QPushButton#removeBlockButton,
+.QPushButton#closeUserlist, .QPushButton#connectingExitButton{
+	background-color: #E5000F;
+	font-family: Arial;
+}
+.QCheckBox#defaultCheckBox{
+	background-color: #E5000F;
+	font-family: Arial;
+	selection-background-color: gray;
+}
+.ConfirmDeleteDialog{
+	background-color: #E5000F;
+	font-family: Arial;
+}
+.AddFriendDialog{
+	background-color: #E5000F;
+	font-family: Arial;
+}
+.AddBlockedDialog{
+	background-color: #E5000F;
+	font-family: Arial;
+}
+.BlockedDialog{
+	background-color: #E5000F;
+	font-family: Arial;
+}
+.QListWidget#blockedList, .QListWidget#userList{
+	background-color: black;
+	border: 2px solid #FFA4A4;
+}
+.QListWidget::item{
+	color: white;
+}
+.QListWidget::item::selected, .QListWidget::item::selected::hover{
+	background-color: gray;
+}
+.QListWidget::item::hover{
+	background-color: rgb(200,200,200,50);
+}
+.QLineEdit#addChumInput{
+	background-color: #E5000F;
+	border: 1px solid black;
+	selection-background-color: gray;
+}
+.InvalidUserDialog{
+	background-color: #E5000F;
+	font-family: Arial;
+}
+.ConnectingDialog{
+	background-color: #E5000F;
+	font-family: Arial;
+}
+.UserlistWindow{
+	background-color: #E5000F;
+	font-family: Arial;
+}
+.OptionsWindow{
+	background-color: #E5000F;
+	font-family: Arial;
+}
+.OptionsWindow .QPushButton[checkable="true"]{
+	background-color: #E5000F;
+	font-family: Arial;
+}
+.OptionsWindow .QPushButton[checkable="true"]::selected{
+	font-family: Arial;
+}
