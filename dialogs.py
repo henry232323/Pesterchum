@@ -96,7 +96,6 @@ class TabWindow(QWidget):
             icon = QIcon("resources/pc_chummy.png")
             a = self.tabWidget.addTab(windw, icon, user)
             tab = self.tabWidget.widget(a)
-            tab.setStyleSheet(self.app.theme["styles"])
             self.users.append(user)
             return tab
         else:
@@ -113,8 +112,6 @@ class SwitchDialog(QDialog):
         uic.loadUi(parent.theme["ui_path"] + "/SwitchDialog.ui", self)
         self.app = app
         self.setWindowTitle('Switch')
-        self.setWindowIcon(QIcon("resources/pc_chummy.png"))
-        self.setStyleSheet(self.parent.theme["styles"])
         self.proceedButton.clicked.connect(self.accepted)
         self.cancelButton.clicked.connect(self.close)
         self.deleteProfileButton.clicked.connect(self.delete_profile)
@@ -269,21 +266,18 @@ class BlockedDialog(QDialog):
         dialog = AddBlockedDialog(self.app, self)
 
     def remove(self):
-        try:
-            selected = self.blockedList.selectedItems()
-            if selected:
-                item = selected[0]
-                index = self.blockedList.indexFromItem(item)
-                self.blockedList.takeItem(index.row())
-                user = item.text()
-                self.app.blocked.remove(user)
-                if user in self.app.friends.keys():
-                    treeitem = QTreeWidgetItem()
-                    treeitem.setText(0, user)
-                    treeitem.setIcon(0, QIcon(self.app.theme["path"] + "/offline.png"))
-                    self.app.gui.chumsTree.addTopLevelItem(treeitem)
-        except Exception as e:
-            print(e)
+        selected = self.blockedList.selectedItems()
+        if selected:
+            item = selected[0]
+            index = self.blockedList.indexFromItem(item)
+            self.blockedList.takeItem(index.row())
+            user = item.text()
+            self.app.blocked.remove(user)
+            if user in self.app.friends.keys():
+                treeitem = QTreeWidgetItem()
+                treeitem.setText(0, user)
+                treeitem.setIcon(0, QIcon(self.app.theme["path"] + "/offline.png"))
+                self.app.gui.chumsTree.addTopLevelItem(treeitem)
 
 class ConnectingDialog(QDialog):
     def __init__(self, app, parent):
@@ -372,6 +366,7 @@ class OptionsWindow(QWidget):
             self.show()
         except Exception as e:
             print(e)
+            
     def saveConfig(self):
         oldtheme = self.app.theme_name
         try:

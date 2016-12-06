@@ -1,6 +1,6 @@
 from PyQt5.QtWidgets import *
-from PyQt5.QtGui import QIcon, QFont, QTextCursor, QPixmap, QColor
-from PyQt5.QtCore import Qt, pyqtSlot
+from PyQt5.QtGui import QIcon, QFont, QTextCursor, QPixmap, QColor, QDesktopServices
+from PyQt5.QtCore import Qt, pyqtSlot, QUrl
 from PyQt5 import uic
 
 import os.path, json
@@ -32,6 +32,11 @@ class Gui(QMainWindow):
         width = self.frameGeometry().width()
         height = self.frameGeometry().height()
         self.setFixedSize(width, height)
+
+        #Make window movable from 'Pesterchum' label, for lack of Title Bar
+        self.appLabel.mousePressEvent = self.label_mousePressEvent
+        self.appLabel.mouseMoveEvent = self.label_mouseMoveEvent
+        self.nameButton.setText(self.app.nick)
         
         #Set window info
         self.setWindowTitle('Pesterchum')
@@ -81,6 +86,7 @@ class Gui(QMainWindow):
         if indexes:
             menu = QMenu()
             menu.addAction(self.removeFriendContext)
+            menu.addAction(self.blockContext)
             menu.exec_(self.chumsTree.viewport().mapToGlobal(position))
 
     def openUserList(self):
@@ -89,13 +95,18 @@ class Gui(QMainWindow):
     def openOptions(self):
         self.userList = OptionsWindow(self.app, self)
 
-    async def openReconnect(self):
-        self.connectingDialog = ConnectingDialog(self.app, self)
+    def openCalspritePM(self):
+        self.start_privmsg("calSprite")
 
-    async def closeReconnect(self):
-        if self.connectingDialog:
-            self.connectingDialog.close()
-            self.connectingDialog = None
+    def openNickservPM(self):
+        self.start_privmsg("nickServ")
+
+    def openHelp(self):
+        QDesktopServices.openUrl(QUrl("https://github.com/henry232323/Pesterchum"))
+
+    def openBug(self):
+        QDesktopServices.openUrl(QUrl("https://github.com/henry232323/Pesterchum/issues"))
+
 
     def remove_chum(self):
         items = self.chumsTree.selectedItems()

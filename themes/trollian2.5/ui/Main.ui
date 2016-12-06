@@ -94,7 +94,7 @@
        <item>
         <widget class="QPushButton" name="addChumButton">
          <property name="text">
-          <string>ADD CHUM</string>
+          <string>ADD CHUMP</string>
          </property>
         </widget>
        </item>
@@ -108,7 +108,7 @@
        <item>
         <widget class="QPushButton" name="pesterButton">
          <property name="text">
-          <string>PESTER!</string>
+          <string>TROLL</string>
          </property>
         </widget>
        </item>
@@ -117,7 +117,7 @@
      <item>
       <widget class="QLabel" name="handleLabel">
        <property name="text">
-        <string>CHUMHANDL</string>
+        <string>TROLLTAG:</string>
        </property>
       </widget>
      </item>
@@ -183,7 +183,7 @@
             <string extracomment="mood"/>
            </property>
            <property name="text">
-            <string>CHUMMY</string>
+            <string>ECSTATIC</string>
            </property>
            <property name="checkable">
             <bool>true</bool>
@@ -199,7 +199,7 @@
             <string extracomment="mood"/>
            </property>
            <property name="text">
-            <string>DISTRAUGHT</string>
+            <string>DISCONTENT</string>
            </property>
            <property name="checkable">
             <bool>true</bool>
@@ -212,7 +212,7 @@
             <string extracomment="mood"/>
            </property>
            <property name="text">
-            <string>PRANKY</string>
+            <string>DEVIOUS</string>
            </property>
            <property name="checkable">
             <bool>true</bool>
@@ -225,7 +225,7 @@
             <string extracomment="mood"/>
            </property>
            <property name="text">
-            <string>RANCOROUS</string>
+            <string>DETESTFUL</string>
            </property>
            <property name="checkable">
             <bool>true</bool>
@@ -238,7 +238,7 @@
             <string extracomment="mood"/>
            </property>
            <property name="text">
-            <string>PLEASANT</string>
+            <string>RELAXED</string>
            </property>
            <property name="checkable">
             <bool>true</bool>
@@ -254,7 +254,7 @@
             <string extracomment="mood"/>
            </property>
            <property name="text">
-            <string>SMOOTH</string>
+            <string>SLEEK</string>
            </property>
            <property name="checkable">
             <bool>true</bool>
