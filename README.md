@@ -12,7 +12,6 @@ Pictures borrowed from illuminatedWax's version found [here](https://github.com/
 - CURRENT USERS
 - USERLIST
 - Disconnected blocking dialog
-- Names list
 - Add in window config
 - Add Memos
 - Regularize custom themes

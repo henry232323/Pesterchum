@@ -10,6 +10,7 @@ from asyncio import async as aioasync
 from themes import *
 from messages import *
 from dialogs import *
+from ui_initialization import *
 
 class Gui(QMainWindow):
     def __init__(self, loop, app, **kwargs):
@@ -20,6 +21,8 @@ class Gui(QMainWindow):
         self.friends = self.app.friends
         self.color = self.app.color
         self.theme = self.app.theme
+        #Set current PM window and Connecting to none
+        self.tabWindow = None
         self.connectingDialog = None
 
     def initialize(self):
@@ -35,83 +38,10 @@ class Gui(QMainWindow):
         self.setWindowIcon(QIcon("resources/pc_chummy.png"))
         self.setWindowFlags(Qt.FramelessWindowHint)
 
-        #Make window movable from 'Pesterchum' label, for lack of Title Bar
-        self.appLabel.mousePressEvent = self.label_mousePressEvent
-        self.appLabel.mouseMoveEvent = self.label_mouseMoveEvent
-        self.nameButton.setText(self.app.nick)
-
-        #Set current PM window to none
-        self.tabWindow = None
-
-        #Initialize top Menu
-        self.menubar = self.menuBar()
-        self.clientMenu = self.menubar.addMenu("Client")
-        self.clientMenu.setStyleSheet(self.theme["styles"])
-        self.profileMenu = self.menubar.addMenu("Profile")
-        self.helpMenu = self.menubar.addMenu("Help")
-
-        #Create USERLIST button in 'CLIENT' menu
-        self.userlistAction = QAction("USERLIST",self)
-        self.userlistAction.triggered.connect(self.openUserList)
-        self.clientMenu.addAction(self.userlistAction)
-
-        #Create IDLE button in 'CLIENT' menu
-        self.idleAction = QAction("IDLE", self)
-        self.idleAction.setCheckable(True)
-        self.idleAction.toggled.connect(self.app.toggle_idle)
-        self.clientMenu.addAction(self.idleAction)
-
-        #Create RECONNECT button in 'CLIENT' menu
-        self.reconnectClient = QAction("RECONNECT",self)
-        self.reconnectClient.triggered.connect(self.app.reconnect)
-        self.clientMenu.addAction(self.reconnectClient)
-
-        #Create EXIT button in 'CLIENT' menu
-        self.exitClient = QAction("EXIT",self)
-        self.exitClient.triggered.connect(self.app.exit)
-        self.clientMenu.addAction(self.exitClient)
-
-        #Create TROLLSLUM button in 'PROFILE' menu
-        self.openTrollslum = QAction("TROLLSLUM", self)
-        self.openTrollslum.triggered.connect(self.openBlockedDialog)
-        self.profileMenu.addAction(self.openTrollslum)
-
-        #Create COLOR button in 'PROFILE' menu
-        self.openPicker = QAction("COLOR", self)
-        self.openPicker.triggered.connect(self.color_picker)
-        self.profileMenu.addAction(self.openPicker)
-
-        #Create SWITCH button in 'PROFILE' menu
-        self.openSwitch = QAction("SWITCH", self)
-        self.openSwitch.triggered.connect(self.openSwitchDialog)
-        self.profileMenu.addAction(self.openSwitch)
-
-        #Create REMOVE CHUM button in Chum Context menu
-        self.removeFriendContext = QAction("REMOVE CHUM")
-        self.removeFriendContext.triggered.connect(self.remove_chum)
-
-        #Create BLOCK button in Chum Context menu
-        self.removeFriendContext = QAction("BLOCK")
-        self.removeFriendContext.triggered.connect(self.block_selected)
-
-        #Make dictionary of all current mood buttons, manual for now
-        self.mood_buttons = {self.chummyButton.text():self.chummyButton,
-                                 self.prankyButton.text():self.prankyButton,
-                                 self.pleasantButton.text():self.pleasantButton,
-                                 self.smoothButton.text():self.smoothButton,
-                                 self.distraughtButton.text():self.distraughtButton,
-                                 self.rancorousButton.text():self.rancorousButton,
-                                 self.abscondButton.text():self.abscondButton}
-        self.nameButton.setIcon(QIcon(self.theme["path"] + "/chummy.png"))
-        #Set stylesheet and set an action for every defined mood button
-        #In the dictionary, give it the corresponding Icon
-        for name, button in self.mood_buttons.items():
-            button.setIcon(QIcon(os.path.join(self.theme["path"], name + ".png")))
-            button.setStyleSheet(self.theme["styles"])
-            button.clicked.connect(self.make_setMood(button))
-
-        #Make color picker open on opening of the Color Button
-        self.colorButton.clicked.connect(self.color_picker)
+        #Initialize Menu
+        initialize_menu(self)
+        #Initialize Buttons
+        initialize_buttons(self)
 
         #Create a QTreeWidgetItem for each friend and add it to the chumsTree dropdown
         #Assume by default they are offline
@@ -155,6 +85,9 @@ class Gui(QMainWindow):
 
     def openUserList(self):
         self.userList = UserlistWindow(self.app, self)
+
+    def openOptions(self):
+        self.userList = OptionsWindow(self.app, self)
 
     async def openReconnect(self):
         self.connectingDialog = ConnectingDialog(self.app, self)

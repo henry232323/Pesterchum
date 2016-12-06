@@ -12,6 +12,8 @@ from themes import *
 from messages import *
 from config import Config, template_config
 from moods import *
+from options import *
+
             
 class App(QApplication):
     def __init__(self):
@@ -25,14 +27,14 @@ class App(QApplication):
         self.names_list = dict()
         self.online = []
 
-        #Initialize config and moods
-        self.config = Config 
+        #Initialize config options and moods
+        self.config = Config
+        self.options = Options
         self.moods = Moods(self)
 
         #Initialize theme & styles
-        self.theme = themes[self.config["lastTheme"]]
-        self.theme_name = self.theme["name"] 
-        self.setStyleSheet(self.theme["styles"])
+        self.themes = themes
+        self.change_theme(self.config["lastTheme"])
 
         #Initialize configurations
         self.friends = self.config["friends"] 
@@ -58,6 +60,11 @@ class App(QApplication):
         aioasync(coro)
         self.gui.initialize()
         loop.run_forever()
+
+    def change_theme(self, theme):
+        self.theme = themes[theme]
+        self.theme_name = self.theme["name"] 
+        self.setStyleSheet(self.theme["styles"])        
 
     def change_nick(self, nick, color):
         #Change user nickname or 'Chumhandle'
