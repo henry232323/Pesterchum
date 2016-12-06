@@ -13,7 +13,6 @@ from messages import *
 from config import Config, template_config
 from moods import *
 from options import *
-
             
 class App(QApplication):
     def __init__(self):

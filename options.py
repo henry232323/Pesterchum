@@ -29,7 +29,7 @@ default_options = {
         }
     }
 
-confpath = "resources/options.json"
+confpath = "cfg/options.json"
 if os.path.exists(confpath):
     with open(confpath, 'r') as options:
         data = options.read()

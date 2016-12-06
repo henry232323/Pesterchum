@@ -12,7 +12,7 @@ template_config = dict(users={uname:"#000000"},
                    userlist=dict(),
                    blocked=list()) 
 
-with open("resources/config.json", 'r') as config:
+with open("cfg/config.json", 'r') as config:
     data = config.read()
 if data:
     #If missing any data, fill in from the template

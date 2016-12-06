@@ -234,7 +234,8 @@
 .QPushButton#deleteProfileButton,
 .QPushButton#acceptButton, .QPushButton#rejectButton,
 .QPushButton#addBlockButton, .QPushButton#removeBlockButton,
-.QPushButton#closeUserlist, .QPushButton#connectingExitButton{
+.QPushButton#closeUserlist, .QPushButton#connectingExitButton,
+.QPushButton#refreshThemeButton{
 	background-color: #fdb302;
 	font-family: Courier New;
 }
