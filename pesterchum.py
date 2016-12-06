@@ -64,7 +64,9 @@ class App(QApplication):
     def change_theme(self, theme):
         self.theme = themes[theme]
         self.theme_name = self.theme["name"] 
-        self.setStyleSheet(self.theme["styles"])        
+        self.setStyleSheet(self.theme["styles"])
+        if hasattr(self, "gui"):
+            self.gui.initialize()
 
     def change_nick(self, nick, color):
         #Change user nickname or 'Chumhandle'
@@ -242,6 +244,7 @@ class App(QApplication):
             self.config['defaultuser'] = self.nick
             self.config['users'] = self.users
             self.config['blocked'] = self.blocked
+            self.config['lastTheme'] = self.theme_name
             config.write(json.dumps(self.config))
         msg = "QUIT :Disconnected"
         self.client.send(msg)

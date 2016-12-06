@@ -1,5 +1,5 @@
 from PyQt5.QtWidgets import *
-from PyQt5.QtGui import QIcon, QFont, QTextCursor, QPixmap, QColor
+from PyQt5.QtGui import QIcon, QFont, QTextCursor, QPixmap, QColor, QDesktopServices
 from PyQt5.QtCore import Qt, pyqtSlot
 from PyQt5 import uic
 
@@ -8,11 +8,6 @@ import asyncio
 from asyncio import async as aioasync
 
 def initialize_menu(self):
-    #Make window movable from 'Pesterchum' label, for lack of Title Bar
-    self.appLabel.mousePressEvent = self.label_mousePressEvent
-    self.appLabel.mouseMoveEvent = self.label_mouseMoveEvent
-    self.nameButton.setText(self.app.nick)
-
     #Initialize top Menu
     self.menubar = self.menuBar()
     self.clientMenu = self.menubar.addMenu("CLIENT")
@@ -60,13 +55,33 @@ def initialize_menu(self):
     self.openSwitch.triggered.connect(self.openSwitchDialog)
     self.profileMenu.addAction(self.openSwitch)
 
+    #Create HELP button in 'HELP' menu
+    self.openHelpAction = QAction("HELP", self)
+    self.openHelpAction.triggered.connect(self.openHelp)
+    self.helpMenu.addAction(self.openHelpAction)
+
+    #Create NICKSERV button in 'HELP' menu
+    self.openNickserv = QAction("NICKSERV", self)
+    self.openNickserv.triggered.connect(self.openNickservPM)
+    self.helpMenu.addAction(self.openNickserv)
+
+    #Create CALSPRITE button in 'HELP' menu
+    self.openCalsprite = QAction("CALSPRITE", self)
+    self.openCalsprite.triggered.connect(self.openCalspritePM)
+    self.helpMenu.addAction(self.openCalsprite)
+
+    #Create REPORT BUG button in 'HELP' menu
+    self.openBugAction = QAction("REPORT BUG", self)
+    self.openBugAction.triggered.connect(self.openBug)
+    self.helpMenu.addAction(self.openBugAction)
+
     #Create REMOVE CHUM button in Chum Context menu
     self.removeFriendContext = QAction("REMOVE CHUM")
     self.removeFriendContext.triggered.connect(self.remove_chum)
 
     #Create BLOCK button in Chum Context menu
-    self.removeFriendContext = QAction("BLOCK")
-    self.removeFriendContext.triggered.connect(self.block_selected)
+    self.blockContext = QAction("BLOCK")
+    self.blockContext.triggered.connect(self.block_selected)
 
 def initialize_buttons(self):
     #Make dictionary of all current mood buttons, manual for now
@@ -82,7 +97,6 @@ def initialize_buttons(self):
     #In the dictionary, give it the corresponding Icon
     for name, button in self.mood_buttons.items():
         button.setIcon(QIcon(os.path.join(self.theme["path"], name + ".png")))
-        button.setStyleSheet(self.theme["styles"])
         button.clicked.connect(self.make_setMood(button))
 
     #Make color picker open on opening of the Color Button
