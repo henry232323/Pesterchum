@@ -10,9 +10,9 @@ from gui import Gui
 from client import Client
 from themes import *
 from messages import *
-from config import Config, template_config
+from config import Config, template_config, save_config 
 from moods import *
-from options import *
+from options import Options, default_options, save_options
             
 class App(QApplication):
     def __init__(self):
@@ -123,6 +123,7 @@ class App(QApplication):
         messages = msg.split("\r\n")
         for message in messages:
             if message:
+                #print(msg)
                 process_received_msg(self, message)
 
     def pm_received(self, msg, user):
@@ -236,15 +237,15 @@ class App(QApplication):
         #Called when exiting the client
         #Save configurations and sys.exit
         self.client.send("QUIT :Disconnected\r\n")
-        with open("resources/config.json", 'w') as config:
-            self.config["friends"] = self.friends
-            self.config["users"] = self.users
-            self.config["userlist"] = self.userlist
-            self.config['defaultuser'] = self.nick
-            self.config['users'] = self.users
-            self.config['blocked'] = self.blocked
-            self.config['lastTheme'] = self.theme_name
-            config.write(json.dumps(self.config))
+        self.config["friends"] = self.friends
+        self.config["users"] = self.users
+        self.config["userlist"] = self.userlist
+        self.config['defaultuser'] = self.nick
+        self.config['users'] = self.users
+        self.config['blocked'] = self.blocked
+        self.config['lastTheme'] = self.theme_name
+        save_config(self.config)
+        save_options(self.options)
         msg = "QUIT :Disconnected"
         self.client.send(msg)
         sys.exit()

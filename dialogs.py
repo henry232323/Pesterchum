@@ -326,7 +326,6 @@ class OptionsWindow(QWidget):
             self.setWindowTitle('Userlist')
             self.setWindowIcon(QIcon("resources/pc_chummy.png"))
             self.options = self.app.options
-
             width = self.frameGeometry().width()
             height = self.frameGeometry().height()
             self.setFixedSize(width, height)
@@ -339,6 +338,9 @@ class OptionsWindow(QWidget):
             self.acceptButton.clicked.connect(self.saveConfig)
             self.rejectButton.clicked.connect(self.close)
             self.themesComboBox.addItems(self.app.themes.keys())
+            self.themesComboBox.setInsertPolicy(QComboBox.InsertAlphabetically)
+            index = self.themesComboBox.findText(self.app.theme_name)
+            self.themesComboBox.setCurrentIndex(index)
             self.refreshThemeButton.clicked.connect(lambda: self.app.change_theme(self.app.theme_name))
 
             convo_opt = self.options["conversations"]
@@ -361,8 +363,15 @@ class OptionsWindow(QWidget):
             self.clockTypeComboBox.addItems(('12','24'))
             self.clockTypeComboBox.setCurrentIndex(convo_opt["clock_type"])
             #Interface
-            
-
+            self.tabbedConvoBox.setChecked(interface_opt["tabbed_conversations"])
+            self.tabbedMemoBox.setChecked(interface_opt["tabbed_memos"])
+            self.blinkPesterBox.setChecked(interface_opt["blink_taskbar_on_pesters"])
+            self.blinkMemoBox.setChecked(interface_opt["blink_taskbar_on_memos"])
+            self.minimizeCombo.addItems(('Minimize to Taskbar','Minimize to Tray', 'Quit'))
+            self.minimizeCombo.setCurrentIndex(interface_opt["minimize"])
+            self.closeCombo.addItems(('Minimize to Taskbar','Minimize to Tray', 'Quit'))
+            self.closeCombo.setCurrentIndex(interface_opt["close"])
+        
             self.show()
         except Exception as e:
             print(e)
@@ -370,6 +379,27 @@ class OptionsWindow(QWidget):
     def saveConfig(self):
         oldtheme = self.app.theme_name
         try:
+            #Chum List
+            self.options["chum_list"]["hide_offline_chums"] = self.hideOfflineRadio.isChecked()
+            self.options["chum_list"]["show_empty_groups"] = self.showEmptyRadio.isChecked()
+            self.options["chum_list"]["show_number_of_online_chums"] = self.showNumberRadio.isChecked()
+            self.options["chum_list"]["sort_chums"] = self.sortChumsCombo.currentIndex()
+            self.options["chum_list"]["low_bandwidth"] = self.lowBandwidthRadio.isChecked()
+            #Conversations
+            self.options["conversations"]["time_stamps"] = self.timeStampsRadio.isChecked()
+            self.options["conversations"]["show_seconds"] = self.showSecondsRadio.isChecked()
+            self.options["conversations"]["op_and_voice_in_memos"] = self.opVoiceMemoRadio.isChecked()
+            self.options["conversations"]["use_animated_smilies"] = self.animatedSmiliesRadio.isChecked()
+            self.options["conversations"]["receive_random_encounters"] = self.randomEncountersRadio.isChecked()
+            self.options["conversations"]["clock_type"] = self.clockTypeComboBox.currentIndex()
+            #Interface
+            self.options["interface"]["tabbed_conversations"] = self.tabbedConvoBox.isChecked()
+            self.options["interface"]["tabbed_memos"] = self.tabbedMemoBox.isChecked()
+            self.options["interface"]["blink_taskbar_on_pesters"] = self.blinkPesterBox.isChecked()
+            self.options["interface"]["blink_taskbar_on_memos"] = self.blinkMemoBox.isChecked()
+            self.options["interface"]["minimize"] = self.minimizeCombo.currentIndex()
+            self.options["interface"]["close"] = self.closeCombo.currentIndex()
+            
             self.app.change_theme(self.themesComboBox.currentText())
         except Exception as e:
             self.errorLabel.setText("Error changing theme: \n{}".format(e))

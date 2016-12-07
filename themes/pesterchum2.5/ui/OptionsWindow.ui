@@ -262,6 +262,9 @@
              </item>
              <item>
               <widget class="QCheckBox" name="opVoiceMemoRadio">
+               <property name="enabled">
+                <bool>false</bool>
+               </property>
                <property name="text">
                 <string>Show OP and Voice Messages in Memos</string>
                </property>
@@ -269,6 +272,9 @@
              </item>
              <item>
               <widget class="QCheckBox" name="animatedSmiliesRadio">
+               <property name="enabled">
+                <bool>false</bool>
+               </property>
                <property name="text">
                 <string>Use animated smilies</string>
                </property>
@@ -355,14 +361,14 @@
                 </widget>
                </item>
                <item row="0" column="1">
-                <widget class="QComboBox" name="comboBox_3">
+                <widget class="QComboBox" name="minimizeCombo">
                  <property name="enabled">
                   <bool>false</bool>
                  </property>
                 </widget>
                </item>
                <item row="1" column="1">
-                <widget class="QComboBox" name="comboBox_4">
+                <widget class="QComboBox" name="closeCombo">
                  <property name="enabled">
                   <bool>false</bool>
                  </property>
