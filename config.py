@@ -1,5 +1,5 @@
 from random import randint
-import json
+import json, os
 
 #If a username is not defined, generate a random 'pesterClient' name
 uname = "pesterClient" + str(randint(100, 700))
@@ -12,6 +12,8 @@ template_config = dict(users={uname:"#000000"},
                    userlist=dict(),
                    blocked=list()) 
 
+if not os.path.exists("cfg"):
+    os.mkdir("cfg")
 with open("cfg/config.json", 'r') as config:
     data = config.read()
 if data:
@@ -23,4 +25,7 @@ if data:
             Config[key] = template_config[key]
 else: #In case we need to reference the template again
     Config = {key:value for key,value in template_config.items()}
-        
+
+def save_config(config):
+    with open("cfg/config.json", 'w') as conffile:    
+        conffile.write(json.dumps(config))  

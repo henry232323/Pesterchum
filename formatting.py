@@ -37,7 +37,7 @@ def fmt_me_msg(app, msg, user, time=False):
     timefmt = '<span style="color:black;">[{}]</style>'.format(getTime(app)) if time else ""
     fmt = '<b>{timefmt}<span style="color:#646464;"> -- {user}{suffix} {init} {predicate}--</span></b><br />'
     msg = fmt.format(user=user, init=getInitials(app, user, c=True),
-                     timefmt=timefmt, predicate=predicate, suffix=suffix)
+                     timefmt=timefmt if app.options["conversations"]["time_stamps"] else "", predicate=predicate, suffix=suffix)
     return msg
 
 def fmt_disp_msg(app, msg, user=None):
@@ -63,8 +63,8 @@ def fmt_disp_msg(app, msg, user=None):
         time = getTime(app)
         init = getInitials(app, user, b=False)
         color = app.getColor(user)
-        fmt = '<b><span style="color:black;">[{time}] <span style="color:{color};">{init}: {msg}</span></span></b><br />'
-        msg = fmt.format(time=time,init=init,msg=msg.strip(),color=color)
+        fmt = '<b><span style="color:black;">{time} <span style="color:{color};">{init}: {msg}</span></span></b><br />'
+        msg = fmt.format(time="[" + time + "]" if app.options["conversations"]["time_stamps"] else "",init=init,msg=msg.strip(),color=color)
     return msg
 
 def fmt_img(src):
@@ -127,7 +127,7 @@ def rgb(triplet, type=str):
 def getTime(app):
     '''Get current time in UTC based off settings'''
     time = datetime.utcnow()
-    if app.config["timestamp_show_seconds"]:
+    if app.options["conversations"]["show_seconds"]:
         fmt = "{hour}:{minute}:{sec}"
     else:
         fmt = "{hour}:{minute}"

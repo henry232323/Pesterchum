@@ -51,6 +51,7 @@ class Gui(QMainWindow):
         #Create a QTreeWidgetItem for each friend and add it to the chumsTree dropdown
         #Assume by default they are offline
         for item in self.friends.keys():
+            #if (self.app.options["chum_list"]["hide_offline_chums"] and item in self.app.names_list) or not self.app.options["chum_list"]["hide_offline_chums"]:
             treeitem = QTreeWidgetItem()
             treeitem.setText(0, item)
             treeitem.setIcon(0, QIcon(self.theme["path"] + "/offline.png"))

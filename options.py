@@ -20,7 +20,7 @@ default_options = {
         "tabbed_conversations":True,
         "tabbed_memos":True,
         "minimize":0,
-        "close":0,
+        "close":1,
         "blink_taskbar_on_pesters":False,
         "blink_taskbar_on_memos":False
         },
@@ -29,6 +29,8 @@ default_options = {
         }
     }
 
+if not os.path.exists("cfg"):
+    os.mkdir("cfg")
 confpath = "cfg/options.json"
 if os.path.exists(confpath):
     with open(confpath, 'r') as options:
@@ -50,3 +52,8 @@ else:
     with open(confpath, 'r') as options:
         data = options.read()
     Options = json.loads(data)
+
+
+def save_options(config):
+    with open("cfg/options.json", 'w') as conffile:    
+        conffile.write(json.dumps(config))  
