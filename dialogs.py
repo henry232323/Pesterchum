@@ -299,20 +299,23 @@ class ConnectingDialog(QDialog):
 class UserlistWindow(QWidget):
     def __init__(self, app, parent):
         super(__class__, self).__init__()
-        uic.loadUi(app.theme["ui_path"] + "/UserlistWindow.ui", self)
-        self.app = app
-        self.parent = parent
-        self.closeUserlist.clicked.connect(self.close)
-        self.setWindowTitle('Userlist')
-        self.setWindowIcon(QIcon("resources/pc_chummy.png"))
+        try:
+            uic.loadUi(app.theme["ui_path"] + "/UserlistWindow.ui", self)
+            self.app = app
+            self.parent = parent
+            self.closeUserlist.clicked.connect(self.close)
+            self.setWindowTitle('Userlist')
+            self.setWindowIcon(QIcon("resources/pc_chummy.png"))
 
-        width = self.frameGeometry().width()
-        height = self.frameGeometry().height()
-        self.setFixedSize(width, height)
+            width = self.frameGeometry().width()
+            height = self.frameGeometry().height()
+            self.setFixedSize(width, height)
 
-        self.userList.setSortingEnabled(True)
-        self.userList.addItems(self.app.names_list["#pesterchum"])
-        self.userList.itemDoubleClicked.connect(self.app.gui.open_privmsg_userlist)
+            self.userList.setSortingEnabled(True)
+            self.userList.addItems(self.app.names_list["#pesterchum"])
+            self.userList.itemDoubleClicked.connect(self.app.gui.open_privmsg_userlist)
+        except Exception as e:
+            print(e)
         
         self.show()
 
