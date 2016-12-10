@@ -13,6 +13,9 @@ from messages import *
 from config import Config, template_config, save_config 
 from moods import *
 from options import Options, default_options, save_options
+import commands
+
+from oyoyo import cmdhandler, parse
             
 class App(QApplication):
     def __init__(self):
@@ -26,10 +29,12 @@ class App(QApplication):
         self.names_list = dict()
         self.online = []
 
-        #Initialize config options and moods
+        #Initialize imports
         self.config = Config
         self.options = Options
         self.moods = Moods(self)
+        self.commands = commands
+        self.handler = cmdhandler.CommandHandler(self, self.commands)
 
         #Initialize theme & styles
         self.themes = themes
@@ -118,12 +123,38 @@ class App(QApplication):
         #Process a message, to user / channel
         process_send_msg(self, msg, user=user)
 
+    def send(self, msg, user=None):
+        bargs = []
+        for arg in args:
+            if isinstance(arg, str):
+                bargs.append(arg.encode())
+            elif isinstance(arg, bytes):
+                bargs.append(arg)
+            else:
+                raise cmdhandler.IRCClientError('Refusing to send one of the args from provided: %s'
+                                     % repr([(type(arg), arg) for arg in args]))
+
+        msg = " ".encode().join(bargs)
+        self.client.send(msg + "\r\n".encode())    
+
     def msg_received(self, msg):
+        msgs = msg.split("\n")
+        for msg in msgs:
+            if msg:
+                prefix, command, args = parse.parse_raw_irc_command(msg)
+                if prefix:
+                    prefix = parse.parse_nick(prefix.decode())[0]
+                try:
+                    self.handler.run(command, prefix, *args)
+                except cmdhandler.CommandError as e:
+                    print(e)
+
+    def msg_received1(self, msg):
         #Process a received message
         messages = msg.split("\r\n")
         for message in messages:
             if message:
-                #print(msg)
+                print(msg)
                 process_received_msg(self, message)
 
     def pm_received(self, msg, user):
@@ -205,11 +236,8 @@ class App(QApplication):
         if self.idle and self.gui.tabWindow:
             for user in self.gui.tabWindow.users:
                 process_send_msg(self, "PESTERCHUM:IDLE", user=user)
-                try:
-                    tab = self.gui.start_privmsg(user)
-                    tab.display_text(fmt_me_msg(self, "/me is now idle chum!", user=self.nick))
-                except Exception as e:
-                    print(e)
+                tab = self.gui.start_privmsg(user)
+                tab.display_text(fmt_me_msg(self, "/me is now idle chum!", user=self.nick))
         
     def join(self):
         #Called once the MODE keyword is seen in received messages
