@@ -139,9 +139,13 @@ class App(QApplication):
 
     def msg_received(self, msg):
         msgs = msg.split("\n")
+        msg2 = msg
         for msg in msgs:
-            if msg:
-                prefix, command, args = parse.parse_raw_irc_command(msg)
+            if msg.strip():
+                try:
+                    prefix, command, args = parse.parse_raw_irc_command(msg)
+                except IndexError:
+                    print(msg2)
                 if prefix:
                     prefix = parse.parse_nick(prefix.decode())[0]
                 try:

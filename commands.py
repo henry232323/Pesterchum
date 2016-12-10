@@ -40,7 +40,6 @@ def privmsg(app, user, channel, *args):
         if message.startswith("MOOD >"):
             mood = message[6:]
         #If it is a mood, parse
-        if mood:
             mood = mood.strip()
             mood = int(mood.strip())
             #If its a friend, set that users mood
