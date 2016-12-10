@@ -39,7 +39,7 @@ def privmsg(app, user, channel, *args):
     if (channel == "#pesterchum") and (user in app.online) and b"MOOD" in args[-1]:
         if message.startswith("MOOD >"):
             mood = message[6:]
-        #If it is a mood, parse
+            #If it is a mood, parse
             mood = mood.strip()
             mood = int(mood.strip())
             #If its a friend, set that users mood

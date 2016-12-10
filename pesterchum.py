@@ -92,6 +92,15 @@ class App(QApplication):
         mood = self.moods.getMood(name)
         self.send_msg("MOOD >{}".format(mood), user="#pesterchum")
         self.moods.value = mood
+        if type(mood) == str:
+            pass
+        elif type(mood) == int:
+            mood = self.moods.getName(mood)
+        else:
+            return
+        if self.gui.tabWindow:
+            for user in self.gui.tabWindow.users:
+                self.pm_received(fmt_mood_msg(self, mood, self.nick), user)
 
     def changeUserMood(self, user, mood):
         #Called when a friend changes their mood, sets the icon in chumsTree
@@ -152,14 +161,6 @@ class App(QApplication):
                     self.handler.run(command, prefix, *args)
                 except cmdhandler.CommandError as e:
                     print(e)
-
-    def msg_received1(self, msg):
-        #Process a received message
-        messages = msg.split("\r\n")
-        for message in messages:
-            if message:
-                print(msg)
-                process_received_msg(self, message)
 
     def pm_received(self, msg, user):
         #Display processed message, called by process_received_msg
