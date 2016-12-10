@@ -14,6 +14,9 @@ template_config = dict(users={uname:"#000000"},
 
 if not os.path.exists("cfg"):
     os.mkdir("cfg")
+if not os.path.exists("cfg/config.json"):
+    with open("cfg/config.json", 'w+'):
+        pass
 with open("cfg/config.json", 'r') as config:
     data = config.read()
 if data:
