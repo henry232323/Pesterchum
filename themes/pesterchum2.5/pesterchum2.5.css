@@ -14,7 +14,9 @@
 	font-weight: bold;
 	font-family: Courier New;
 	background-color: transparent;
-	selection-background-color: transparent;
+}
+.QMenuBar#menubar::item::selected{
+	background-color: transparent;
 }
 .QMenu{
 	color: black;
@@ -160,6 +162,7 @@
 	font:bold;
 	font-size:12px;
 	min-height:25px;
+    min-width: .25ex;
 }
 .QTabBar::tab::selected{
 	border:0px;
@@ -202,7 +205,7 @@
 	border-color:#BB8800;
 	border-style:solid;
 	border-width:2px;
-	padding: 3px 0px 3px 0px;
+	padding: 1px 0px 1px 0px;
 	font-family: Courier New;
 }
 .SwitchDialog{

@@ -10,10 +10,11 @@ sys.argv.append("build")
 include_files = ["resources", "themes", "cfg"]
 
 build_exe_options = {
-    "includes":["PyQt5", "os", "json", "asyncio"],
+    "includes":["PyQt5", "os", "json", "asyncio", "types"],
     "excludes":["tkinter", "_tkinter", '_gtkagg', '_tkagg', 'bsddb', 'curses',
             'email', 'pywin.debugger',
             'pywin.debugger.dbgcon', 'pywin.dialogs', 'tcl'],
+    "packages":["oyoyo"],
     "include_files":include_files,
     }
 
