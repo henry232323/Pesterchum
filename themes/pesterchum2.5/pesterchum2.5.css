@@ -14,6 +14,7 @@
 	font-weight: bold;
 	font-family: Courier New;
 	background-color: transparent;
+	padding-left: 12px;
 }
 .QMenuBar#menubar::item::selected{
 	background-color: transparent;

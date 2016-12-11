@@ -326,7 +326,7 @@ class OptionsWindow(QWidget):
             uic.loadUi(app.theme["ui_path"] + "/OptionsWindow.ui", self)    
             self.app = app
             self.parent = parent
-            self.setWindowTitle('Userlist')
+            self.setWindowTitle('Options')
             self.setWindowIcon(QIcon("resources/pc_chummy.png"))
             self.options = self.app.options
             width = self.frameGeometry().width()

@@ -10,10 +10,10 @@ from gui import Gui
 from client import Client
 from themes import *
 from messages import *
-from config import Config, template_config, save_config 
 from moods import *
+from config import Config, template_config, save_config
 from options import Options, default_options, save_options
-import commands
+from commands import Commands
 
 from oyoyo import cmdhandler, parse
             
@@ -22,7 +22,7 @@ class App(QApplication):
         QApplication.__init__(self, sys.argv)
         #Establish loop as Quamash Event Loop
         loop = QEventLoop(self)
-        self.loop = loop 
+        self.loop = loop
         asyncio.set_event_loop(loop)
         self.connected = False #Set Connection state
         self.idle = False
@@ -33,7 +33,7 @@ class App(QApplication):
         self.config = Config
         self.options = Options
         self.moods = Moods(self)
-        self.commands = commands
+        self.commands = Commands
         self.handler = cmdhandler.CommandHandler(self, self.commands)
 
         #Initialize theme & styles
