@@ -1,4 +1,3 @@
-from commands import process_commands
 from formatting import *
 
 def process_send_msg(app, msg, user=None):
@@ -29,17 +28,4 @@ def parse_message(s):
         args = s.split()
     command = args.pop(0)
     return prefix, command, args
-        
-def process_received_msg(app, msg):
-    parse = parse_message(msg)
-    if not parse:
-        return
-    user, command, args = parse
-    #If just a echoed message, pass
-    if user == app.nick:
-        return
-    #If blocked, just return
-    if user in app.blocked:
-        return
-    process_commands(app, parse)
 
