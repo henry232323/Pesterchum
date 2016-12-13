@@ -8,6 +8,14 @@ def process_commands(*args):
     pass
 
 class Commands:
+    def notice(app, nick, chan, msg):
+        msg = msg.decode()
+        if nick == 'NickServ':
+            if app.gui.tabWindow and "nickServ" in app.gui.tabWindow.users:
+                fmt = fmt_disp_msg(app, msg, user="nickServ")
+                if fmt:
+                    app.pm_received(fmt, "nickServ")
+            
     def ping(app, user, channel, *args):
         send = "PONG :{}\r\n".format(channel.decode())
         app.client.send(send)

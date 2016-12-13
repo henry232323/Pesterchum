@@ -1,11 +1,11 @@
 class Moods(object):
-    def __init__(self, app):
-        self.moods = ["chummy", "rancorous", "offline", "pleasant", "distraught",
+    moods = ["chummy", "rancorous", "offline", "pleasant", "distraught",
              "pranky", "smooth", "ecstatic", "relaxed", "discontent",
              "devious", "sleek", "detestful", "mirthful", "manipulative",
              "vigorous", "perky", "acceptant", "protective", "mystified",
              "amazed", "insolent", "bemused"]
-
+    
+    def __init__(self, app):
         self.usermoods = dict()
         self.value = 0
 

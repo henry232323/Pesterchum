@@ -169,10 +169,11 @@ class Gui(QMainWindow):
     def make_setMood(self, button):
         '''Makes set mood button for each button, each button deselects all others and sets user mood'''
         def setMood():
-            for name, moodButton in self.mood_buttons.items():
+            for num, moodButton in self.mood_buttons.items():
                 if button == moodButton:
-                    self.nameButton.setIcon(QIcon(os.path.join(self.theme["path"], name + ".png")))
-                    self.app.changeMood(name)
+                    mood_name = self.app.moods.getName(num)
+                    self.nameButton.setIcon(QIcon(os.path.join(self.theme["path"], mood_name + ".png")))
+                    self.app.changeMood(mood_name)
                 else:
                     moodButton.setChecked(False)
         return setMood
