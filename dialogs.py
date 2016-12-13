@@ -72,7 +72,8 @@ class TabWindow(QWidget):
         widget = self.tabWidget.widget(currentIndex)
         widget.deleteLater()
         self.tabWidget.removeTab(currentIndex)
-        self.app.send_cease(widget.user)
+        if user != "nickServ":
+            self.app.send_cease(widget.user)
         self.users.remove(widget.user)
         if not self.users:
             self.close()
@@ -80,7 +81,8 @@ class TabWindow(QWidget):
     def closeEvent(self, event):
         '''On window (or tab) close send a PESTERCHUM:CEASE message to each user, destroy self'''
         for user in self.users:
-            self.app.send_cease(user)
+            if user != "nickServ":
+                self.app.send_cease(user)
         event.accept()
         self.app.gui.tabWindow = None
         
@@ -92,7 +94,8 @@ class TabWindow(QWidget):
         '''
         if not user in self.users:
             windw = PrivateMessageWidget(self.app, self.tabWidget, self, user)
-            self.app.send_begin(user)
+            if user != "nickServ":
+                self.app.send_begin(user)
             icon = QIcon("resources/pc_chummy.png")
             a = self.tabWidget.addTab(windw, icon, user)
             tab = self.tabWidget.widget(a)

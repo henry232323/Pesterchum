@@ -106,7 +106,7 @@
 	font-family: Courier New;
 	font-size:11px;
 }
-.QPushButton#rancorousButton{
+.QPushButton#moodButton1{
 	text-align: left;
 	background-color:red;
 	border-color:#BB8800;
@@ -115,7 +115,7 @@
 	padding: 5px 0px 5px 0px;
 	font-family: Courier New;
 }
-.QPushButton#rancorousButton::checked{
+.QPushButton#moodButton1::checked{
 	text-align: left;
 	background-color:white;
 	border-color:#BB8800;
@@ -125,7 +125,7 @@
 	font-family: Courier New;
 	color: red;
 }
-.QPushButton#abscondButton{
+.QPushButton#moodButton2{
 	text-align: center;
 	background-color: black;
 	border-color:#BB8800;
@@ -135,7 +135,7 @@
 	color: white;
 	font-family: Courier New;
 }
-.QPushButton#abscondButton::checked{
+.QPushButton#moodButton2::checked{
 	text-align: center;
 	background-color:white;
 	border-color:#BB8800;

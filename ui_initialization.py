@@ -92,12 +92,26 @@ def initialize_buttons(self):
                              self.distraughtButton.text():self.distraughtButton,
                              self.rancorousButton.text():self.rancorousButton,
                              self.abscondButton.text():self.abscondButton}
-    self.nameButton.setIcon(QIcon(self.theme["path"] + "/chummy.png"))
     #Set stylesheet and set an action for every defined mood button
     #In the dictionary, give it the corresponding Icon
     for name, button in self.mood_buttons.items():
         button.setIcon(QIcon(os.path.join(self.theme["path"], name + ".png")))
         button.clicked.connect(self.make_setMood(button))
 
+
+def initialize_buttons(self):
+    self.nameButton.setIcon(QIcon(self.theme["path"] + "/chummy.png"))
     #Make color picker open on opening of the Color Button
     self.colorButton.clicked.connect(self.color_picker)
+    
+    self.mood_buttons = dict()
+    for num in range(23):
+        name = "moodButton{}".format(num)
+        print(hasattr(self, name))
+        if hasattr(self, name):
+            button = getattr(self, name)
+            self.mood_buttons[num] = button
+            mood_name = self.app.moods.getName(num)
+            button.setIcon(QIcon(os.path.join(self.theme["path"], mood_name + ".png")))
+            button.clicked.connect(self.make_setMood(button))            
+    
