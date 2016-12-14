@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>290</width>
-    <height>619</height>
+    <height>630</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -178,7 +178,7 @@
           <number>0</number>
          </property>
          <item row="0" column="0">
-          <widget class="QPushButton" name="chummyButton">
+          <widget class="QPushButton" name="moodButton7">
            <property name="whatsThis">
             <string extracomment="mood"/>
            </property>
@@ -194,7 +194,7 @@
           </widget>
          </item>
          <item row="2" column="0">
-          <widget class="QPushButton" name="distraughtButton">
+          <widget class="QPushButton" name="moodButton9">
            <property name="whatsThis">
             <string extracomment="mood"/>
            </property>
@@ -207,7 +207,7 @@
           </widget>
          </item>
          <item row="0" column="1">
-          <widget class="QPushButton" name="prankyButton">
+          <widget class="QPushButton" name="moodButton10">
            <property name="whatsThis">
             <string extracomment="mood"/>
            </property>
@@ -220,7 +220,7 @@
           </widget>
          </item>
          <item row="2" column="1">
-          <widget class="QPushButton" name="rancorousButton">
+          <widget class="QPushButton" name="moodButton12">
            <property name="whatsThis">
             <string extracomment="mood"/>
            </property>
@@ -233,7 +233,7 @@
           </widget>
          </item>
          <item row="1" column="0">
-          <widget class="QPushButton" name="pleasantButton">
+          <widget class="QPushButton" name="moodButton8">
            <property name="whatsThis">
             <string extracomment="mood"/>
            </property>
@@ -249,7 +249,7 @@
           </widget>
          </item>
          <item row="1" column="1">
-          <widget class="QPushButton" name="smoothButton">
+          <widget class="QPushButton" name="moodButton11">
            <property name="whatsThis">
             <string extracomment="mood"/>
            </property>
@@ -264,7 +264,7 @@
         </layout>
        </item>
        <item>
-        <widget class="QPushButton" name="abscondButton">
+        <widget class="QPushButton" name="moodButton2">
          <property name="whatsThis">
           <string extracomment="mood"/>
          </property>

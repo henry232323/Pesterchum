@@ -103,11 +103,9 @@ def initialize_buttons(self):
     self.nameButton.setIcon(QIcon(self.theme["path"] + "/chummy.png"))
     #Make color picker open on opening of the Color Button
     self.colorButton.clicked.connect(self.color_picker)
-    
     self.mood_buttons = dict()
     for num in range(23):
         name = "moodButton{}".format(num)
-        print(hasattr(self, name))
         if hasattr(self, name):
             button = getattr(self, name)
             self.mood_buttons[num] = button
