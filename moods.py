@@ -9,10 +9,12 @@ class Moods(object):
         self.usermoods = dict()
         self.value = 0
 
-    def getMood(self, name):
+    @staticmethod
+    def getMood(name):
         name = "offline" if name.lower() == "abscond" else name
-        return self.moods.index(name.lower())
+        return Moods.moods.index(name.lower())
 
-    def getName(self, index):
-        return self.moods[index]
+    @staticmethod
+    def getName(index):
+        return Moods.moods[index]
 

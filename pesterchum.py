@@ -70,6 +70,8 @@ class App(QApplication):
         self.theme_name = self.theme["name"] 
         self.setStyleSheet(self.theme["styles"])
         if hasattr(self, "gui"):
+            self.gui.close()
+            self.gui = Gui(self.loop, self)
             self.gui.initialize()
 
     def change_nick(self, nick, color):
