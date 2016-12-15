@@ -5,6 +5,7 @@ class Client(asyncio.Protocol):
         self.loop = loop
         self.gui = gui
         self.app = app
+        self.buffer = bytes()
 
     def connection_made(self, transport):
         self.sockname = transport.get_extra_info("sockname")
@@ -15,7 +16,11 @@ class Client(asyncio.Protocol):
         self.app.connection_lost(exc)
         
     def data_received(self, data):
-        self.app.msg_received(data.decode())
+        self.buffer += data
+        pts = self.buffer.split(b"\n")
+        self.buffer = pts.pop()
+        for el in pts:
+            self.app.msg_received(el.decode())
 
     def send(self, data):
         #Take data, encode it and send, wraps the transport
