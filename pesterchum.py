@@ -4,7 +4,6 @@ from PyQt5.QtCore import Qt, pyqtSignal
 from quamash import QEventLoop
 
 import asyncio, sys, os.path, json, re
-from asyncio import async as aioasync
 
 from gui import Gui
 from client import Client
@@ -61,7 +60,7 @@ class App(QApplication):
         self.gui = Gui(self.loop, self)
         self.client = Client(self.loop, self.gui, self)
         coro = self.loop.create_connection(lambda: self.client, self.host, self.port)
-        aioasync(coro)
+        asyncio.ensure_future(coro)
         self.gui.initialize()
         loop.run_forever()
 
@@ -221,7 +220,7 @@ class App(QApplication):
         self.client.transport.close()
         self.client = Client(self.loop, self.gui, self)
         coro = self.loop.create_connection(lambda: self.client, self.host, self.port)
-        aioasync(coro)
+        asyncio.ensure_future(coro)
 
     def connection_made(self, transport):
         #On connection_made send NICK and USER commands

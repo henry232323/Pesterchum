@@ -5,7 +5,6 @@ from PyQt5 import uic
 
 import os.path, json
 import asyncio
-from asyncio import async as aioasync
 
 from themes import *
 from messages import *
