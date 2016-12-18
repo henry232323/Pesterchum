@@ -48,6 +48,8 @@ class ProtectedCommandError(CommandError):
     def __str__(self):
         return 'Command "%s" is protected' % ".".join(self.cmd)
         
+class IRCClientError(Exception):
+    pass
 
 class CommandHandler(object):
     """ The most basic CommandHandler """

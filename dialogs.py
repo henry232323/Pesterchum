@@ -72,7 +72,7 @@ class TabWindow(QWidget):
         widget = self.tabWidget.widget(currentIndex)
         widget.deleteLater()
         self.tabWidget.removeTab(currentIndex)
-        if user != "nickServ":
+        if widget.user != "nickServ":
             self.app.send_cease(widget.user)
         self.users.remove(widget.user)
         if not self.users:
@@ -200,10 +200,7 @@ class AddFriendDialog(QDialog):
             self.app.add_friend(user)
             self.close()
         else:
-            try:
-                self.err = InvalidUserDialog(self.app, self, user)
-            except Exception as e:
-                print(e)
+            self.err = InvalidUserDialog(self.app, self, user)
                 
 class AddBlockedDialog(QDialog):
     def __init__(self, app, parent):
@@ -302,86 +299,80 @@ class ConnectingDialog(QDialog):
 class UserlistWindow(QWidget):
     def __init__(self, app, parent):
         super(__class__, self).__init__()
-        try:
-            uic.loadUi(app.theme["ui_path"] + "/UserlistWindow.ui", self)
-            self.app = app
-            self.parent = parent
-            self.closeUserlist.clicked.connect(self.close)
-            self.setWindowTitle('Userlist')
-            self.setWindowIcon(QIcon("resources/pc_chummy.png"))
+        uic.loadUi(app.theme["ui_path"] + "/UserlistWindow.ui", self)
+        self.app = app
+        self.parent = parent
+        self.closeUserlist.clicked.connect(self.close)
+        self.setWindowTitle('Userlist')
+        self.setWindowIcon(QIcon("resources/pc_chummy.png"))
 
-            width = self.frameGeometry().width()
-            height = self.frameGeometry().height()
-            self.setFixedSize(width, height)
+        width = self.frameGeometry().width()
+        height = self.frameGeometry().height()
+        self.setFixedSize(width, height)
 
-            self.userList.setSortingEnabled(True)
-            self.userList.addItems(self.app.names_list["#pesterchum"])
-            self.userList.itemDoubleClicked.connect(self.app.gui.open_privmsg_userlist)
-        except Exception as e:
-            print(e)
-        
+        self.userList.setSortingEnabled(True)
+        self.userList.addItems(self.app.names_list["#pesterchum"])
+        self.userList.itemDoubleClicked.connect(self.app.gui.open_privmsg_userlist)
+    
         self.show()
 
 class OptionsWindow(QWidget):
     def __init__(self, app, parent):
-        try:
-            super(__class__, self).__init__()
-            uic.loadUi(app.theme["ui_path"] + "/OptionsWindow.ui", self)    
-            self.app = app
-            self.parent = parent
-            self.setWindowTitle('Options')
-            self.setWindowIcon(QIcon("resources/pc_chummy.png"))
-            self.options = self.app.options
-            width = self.frameGeometry().width()
-            height = self.frameGeometry().height()
-            self.setFixedSize(width, height)
-            self.buttons = (self.optionsButton1,self.optionsButton2,self.optionsButton3,self.optionsButton4,
-                            self.optionsButton5,self.optionsButton6,self.optionsButton7,self.optionsButton8)
+        super(__class__, self).__init__()
+        uic.loadUi(app.theme["ui_path"] + "/OptionsWindow.ui", self)    
+        self.app = app
+        self.parent = parent
+        self.setWindowTitle('Options')
+        self.setWindowIcon(QIcon("resources/pc_chummy.png"))
+        self.options = self.app.options
+        width = self.frameGeometry().width()
+        height = self.frameGeometry().height()
+        self.setFixedSize(width, height)
+        self.buttons = (self.optionsButton1,self.optionsButton2,self.optionsButton3,self.optionsButton4,
+                        self.optionsButton5,self.optionsButton6,self.optionsButton7,self.optionsButton8)
 
-            for index, button in enumerate(self.buttons):
-                button.clicked.connect(self.make_call(index, button))
-                
-            self.acceptButton.clicked.connect(self.saveConfig)
-            self.rejectButton.clicked.connect(self.close)
-            self.themesComboBox.addItems(self.app.themes.keys())
-            self.themesComboBox.setInsertPolicy(QComboBox.InsertAlphabetically)
-            index = self.themesComboBox.findText(self.app.theme_name)
-            self.themesComboBox.setCurrentIndex(index)
-            self.refreshThemeButton.clicked.connect(lambda: self.app.change_theme(self.app.theme_name))
-
-            convo_opt = self.options["conversations"]
-            chum_opt = self.options["chum_list"]
-            interface_opt = self.options["interface"]
+        for index, button in enumerate(self.buttons):
+            button.clicked.connect(self.make_call(index, button))
             
-            #Chum List
-            self.hideOfflineRadio.setChecked(chum_opt["hide_offline_chums"])
-            self.showEmptyRadio.setChecked(chum_opt["show_empty_groups"])
-            self.showNumberRadio.setChecked(chum_opt["show_number_of_online_chums"])
-            self.sortChumsCombo.addItems(("Alphabetically", "Mood"))
-            self.sortChumsCombo.setCurrentIndex(chum_opt["sort_chums"])
-            self.lowBandwidthRadio.setChecked(chum_opt["low_bandwidth"])
-            #Conversations
-            self.timeStampsRadio.setChecked(convo_opt["time_stamps"])
-            self.showSecondsRadio.setChecked(convo_opt["show_seconds"])
-            self.opVoiceMemoRadio.setChecked(convo_opt["op_and_voice_in_memos"])
-            self.animatedSmiliesRadio.setChecked(convo_opt["use_animated_smilies"])
-            self.randomEncountersRadio.setChecked(convo_opt["receive_random_encounters"])
-            self.clockTypeComboBox.addItems(('12','24'))
-            self.clockTypeComboBox.setCurrentIndex(convo_opt["clock_type"])
-            #Interface
-            self.tabbedConvoBox.setChecked(interface_opt["tabbed_conversations"])
-            self.tabbedMemoBox.setChecked(interface_opt["tabbed_memos"])
-            self.blinkPesterBox.setChecked(interface_opt["blink_taskbar_on_pesters"])
-            self.blinkMemoBox.setChecked(interface_opt["blink_taskbar_on_memos"])
-            self.minimizeCombo.addItems(('Minimize to Taskbar','Minimize to Tray', 'Quit'))
-            self.minimizeCombo.setCurrentIndex(interface_opt["minimize"])
-            self.closeCombo.addItems(('Minimize to Taskbar','Minimize to Tray', 'Quit'))
-            self.closeCombo.setCurrentIndex(interface_opt["close"])
+        self.acceptButton.clicked.connect(self.saveConfig)
+        self.rejectButton.clicked.connect(self.close)
+        self.themesComboBox.addItems(self.app.themes.keys())
+        self.themesComboBox.setInsertPolicy(QComboBox.InsertAlphabetically)
+        index = self.themesComboBox.findText(self.app.theme_name)
+        self.themesComboBox.setCurrentIndex(index)
+        self.refreshThemeButton.clicked.connect(lambda: self.app.change_theme(self.app.theme_name))
+
+        convo_opt = self.options["conversations"]
+        chum_opt = self.options["chum_list"]
+        interface_opt = self.options["interface"]
         
-            self.show()
-        except Exception as e:
-            print(e)
-            
+        #Chum List
+        self.hideOfflineRadio.setChecked(chum_opt["hide_offline_chums"])
+        self.showEmptyRadio.setChecked(chum_opt["show_empty_groups"])
+        self.showNumberRadio.setChecked(chum_opt["show_number_of_online_chums"])
+        self.sortChumsCombo.addItems(("Alphabetically", "Mood"))
+        self.sortChumsCombo.setCurrentIndex(chum_opt["sort_chums"])
+        self.lowBandwidthRadio.setChecked(chum_opt["low_bandwidth"])
+        #Conversations
+        self.timeStampsRadio.setChecked(convo_opt["time_stamps"])
+        self.showSecondsRadio.setChecked(convo_opt["show_seconds"])
+        self.opVoiceMemoRadio.setChecked(convo_opt["op_and_voice_in_memos"])
+        self.animatedSmiliesRadio.setChecked(convo_opt["use_animated_smilies"])
+        self.randomEncountersRadio.setChecked(convo_opt["receive_random_encounters"])
+        self.clockTypeComboBox.addItems(('12','24'))
+        self.clockTypeComboBox.setCurrentIndex(convo_opt["clock_type"])
+        #Interface
+        self.tabbedConvoBox.setChecked(interface_opt["tabbed_conversations"])
+        self.tabbedMemoBox.setChecked(interface_opt["tabbed_memos"])
+        self.blinkPesterBox.setChecked(interface_opt["blink_taskbar_on_pesters"])
+        self.blinkMemoBox.setChecked(interface_opt["blink_taskbar_on_memos"])
+        self.minimizeCombo.addItems(('Minimize to Taskbar','Minimize to Tray', 'Quit'))
+        self.minimizeCombo.setCurrentIndex(interface_opt["minimize"])
+        self.closeCombo.addItems(('Minimize to Taskbar','Minimize to Tray', 'Quit'))
+        self.closeCombo.setCurrentIndex(interface_opt["close"])
+    
+        self.show()
+        
     def saveConfig(self):
         oldtheme = self.app.theme_name
         try:
