@@ -133,7 +133,7 @@ class App(QApplication):
         #Process a message, to user / channel
         process_send_msg(self, msg, user=user)
 
-    def send(self, msg, user=None):
+    def send(self, msg):
         bargs = []
         for arg in args:
             if isinstance(arg, str):
@@ -144,8 +144,8 @@ class App(QApplication):
                 raise cmdhandler.IRCClientError('Refusing to send one of the args from provided: %s'
                                      % repr([(type(arg), arg) for arg in args]))
 
-        msg = " ".encode().join(bargs)
-        self.client.send(msg + "\r\n".encode())    
+        msg = b" ".join(bargs)
+        self.client.send(msg + b"\r\n")    
 
     def msg_received(self, msg):
         msgs = msg.split("\n")
