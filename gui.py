@@ -1,6 +1,5 @@
 from PyQt5.QtWidgets import *
-from PyQt5.QtGui import QIcon, QFont, QTextCursor, \
-     QPixmap, QColor, QDesktopServices, \
+from PyQt5.QtGui import QIcon, QDesktopServices, \
      QStandardItemModel, QStandardItem
 from PyQt5.QtCore import Qt, pyqtSlot, QUrl, QModelIndex, QVariant
 from PyQt5 import uic
