@@ -165,13 +165,13 @@ class Gui(QMainWindow):
 
     def block_selected(self):
         '''Blocks the currently selected user in chumsTree'''
-        selected = self.chumsTree.selectedItems()
+        selected = self.chumsTree.selectedIndexes()
         if selected:
-            user = selected[0].text(0)
+            idx = selected[0]
+            user = self.friendsModel.data(idx)
             if user in self.app.friends.keys():
                 if user not in self.app.blocked:
-                    index = self.app.gui.chumsTree.indexOfTopLevelItem(self.getFriendItem(user)[0])
-                    self.app.gui.chumsTree.takeTopLevelItem(index)
+                    self.app.gui.friendsModel.removeRow(idx.row())
             self.app.add_blocked(user)
             
     def color_picker(self):
