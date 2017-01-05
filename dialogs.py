@@ -1,5 +1,5 @@
 from PyQt5.QtWidgets import *
-from PyQt5.QtGui import QIcon, QFont, QTextCursor, QPixmap, QColor
+from PyQt5.QtGui import QIcon, QTextCursor, QStandardItem
 from PyQt5.QtCore import Qt, pyqtSlot
 from PyQt5 import uic
 
@@ -267,18 +267,21 @@ class BlockedDialog(QDialog):
         dialog = AddBlockedDialog(self.app, self)
 
     def remove(self):
-        selected = self.blockedList.selectedItems()
-        if selected:
-            item = selected[0]
-            index = self.blockedList.indexFromItem(item)
-            self.blockedList.takeItem(index.row())
-            user = item.text()
-            self.app.blocked.remove(user)
-            if user in self.app.friends.keys():
-                treeitem = QTreeWidgetItem()
-                treeitem.setText(0, user)
-                treeitem.setIcon(0, QIcon(self.app.theme["path"] + "/offline.png"))
-                self.app.gui.chumsTree.addTopLevelItem(treeitem)
+        try:
+            selected = self.blockedList.selectedItems()
+            if selected:
+                item = selected[0]
+                index = self.blockedList.indexFromItem(item)
+                self.blockedList.takeItem(index.row())
+                user = item.text()
+                self.app.blocked.remove(user)
+                if user in self.app.friends.keys():
+                    treeitem = QStandardItem(user)
+                    treeitem.setText(user)
+                    treeitem.setIcon(QIcon(self.app.theme["path"] + "/offline.png"))
+                    self.app.gui.friendsModel.appendRow(treeitem)
+        except Exception as e:
+            print(e)
 
 class ConnectingDialog(QDialog):
     def __init__(self, app, parent):
