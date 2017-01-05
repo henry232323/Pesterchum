@@ -1,5 +1,5 @@
 from PyQt5.QtWidgets import *
-from PyQt5.QtGui import QIcon, QFont, QTextCursor, QColor
+from PyQt5.QtGui import QIcon, QStandardItem
 from PyQt5.QtCore import Qt, pyqtSignal
 from quamash import QEventLoop
 
@@ -187,10 +187,11 @@ class App(QApplication):
         #Set the icon by default to
         self.userlist[user] = self.getColor(user)
         self.friends[user] = self.getColor(user)
-        treeitem = QTreeWidgetItem()
-        treeitem.setText(0, user)
-        treeitem.setIcon(0, QIcon(self.theme["path"] + "/offline.png"))
-        self.gui.chumsTree.addTopLevelItem(treeitem)
+        treeitem = QStandardItem(user)
+        treeitem.setText(user)
+        treeitem.setIcon(QIcon(self.theme["path"] + "/offline.png"))
+        self.gui.friendsModel.appendRow(treeitem)
+        self.gui.friendsItems[user] = treeitem
         self.getFriendMood(user)
 
     def remove_friend(self, user, item=None):
