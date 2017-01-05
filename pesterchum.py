@@ -26,6 +26,7 @@ class App(QApplication):
         asyncio.set_event_loop(loop)
         self.connected = False #Set Connection state
         self.idle = False
+        self.theme_name = None
         self.names_list = dict()
         self.online = set()
 
@@ -54,6 +55,7 @@ class App(QApplication):
         self.nick = self.config['defaultuser']
         self.users = self.config['users']
         self.color = self.users[self.nick] if self.nick in self.users.keys() else "#000"
+        self.lowBandwidth = self.options["chum_list"]["low_bandwidth"]
 
         #Establish Connection and GUI, start the loop
         #Connection is an Asynchronous create_connection, takes
@@ -66,13 +68,14 @@ class App(QApplication):
         loop.run_forever()
 
     def change_theme(self, theme):
-        self.theme = themes[theme]
-        self.theme_name = self.theme["name"] 
-        self.setStyleSheet(self.theme["styles"])
-        if hasattr(self, "gui"):
-            self.gui.close()
-            self.gui = Gui(self.loop, self)
-            self.gui.initialize()
+        if theme != self.theme_name:
+            self.theme = themes[theme]
+            self.theme_name = self.theme["name"] 
+            self.setStyleSheet(self.theme["styles"])
+            if hasattr(self, "gui"):
+                self.gui.close()
+                self.gui = Gui(self.loop, self)
+                self.gui.initialize()
 
     def change_nick(self, nick, color):
         #Change user nickname or 'Chumhandle'
@@ -250,6 +253,23 @@ class App(QApplication):
         join = "JOIN #pesterchum\r\n"
         self.client.send(join)
         self.connected = True
+        self.lowBandwidth = False
+
+    def part(self):
+        #Leaves #pesterchum
+        #For low bandwidth mode, stops flood of moods
+        part = "PART #pesterchum\r\n"
+        self.client.send(part)
+        self.lowBandwidth = True
+
+    def toggleLowBandwidth(self):
+        try:
+            if self.lowBandwidth:
+                self.join()
+            else:
+                self.part()
+        except Exception as e:
+            print(e)
 
     def getColor(self, user):
         #Get a user's COLOR

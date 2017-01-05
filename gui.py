@@ -218,9 +218,13 @@ class Gui(QMainWindow):
             QStandardItemModel.__init__(self, parent)
             self.app = app
             self.header_labels = ["Chums ({}/{})".format(len(self.app.online), len(self.app.friends))]
-
+            
         def headerData(self, section, orientation, role=Qt.DisplayRole):
-            self.header_labels = ["Chums ({}/{})".format(len(self.app.online), len(self.app.friends))]
+            if self.app.options["chum_list"]["show_number_of_online_chums"]:
+                fmt = "Chums"
+            else:
+                fmt = "Chums ({}/{})"
+            self.header_labels = [fmt.format(len(self.app.online), len(self.app.friends))]
             if role == Qt.DisplayRole and orientation == Qt.Horizontal:
                 return self.header_labels[section]
             return QStandardItemModel.headerData(self, section, orientation, role)
