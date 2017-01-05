@@ -399,6 +399,7 @@ class OptionsWindow(QWidget):
             self.options["interface"]["close"] = self.closeCombo.currentIndex()
             
             self.app.change_theme(self.themesComboBox.currentText())
+            self.app.toggleLowBandwidth()
         except Exception as e:
             self.errorLabel.setText("Error changing theme: \n{}".format(e))
             self.app_change_theme(oldtheme)
