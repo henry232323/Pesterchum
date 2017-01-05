@@ -13,6 +13,7 @@ from moods import *
 from config import Config, template_config, save_config
 from options import Options, default_options, save_options
 from commands import Commands
+import exceptions
 
 from oyoyo import cmdhandler, parse
             
@@ -26,7 +27,7 @@ class App(QApplication):
         self.connected = False #Set Connection state
         self.idle = False
         self.names_list = dict()
-        self.online = []
+        self.online = set()
 
         #Initialize imports
         self.config = Config
@@ -87,7 +88,8 @@ class App(QApplication):
         self.users[self.nick] = color
         self.gui.colorButton.setStyleSheet('background-color:' + self.color + ';')
         for user in self.userlist.keys():
-                    self.send_msg(fmt_color(self.color), user=user)
+            self.send_msg(fmt_color(self.color), user=user)
+                    
     def changeMood(self, name):
         #Change current user's mood
         mood = self.moods.getMood(name)
@@ -111,8 +113,17 @@ class App(QApplication):
             mood = self.moods.getName(mood)
         else:
             return
-        item = self.gui.getFriendItem(user)[0]
-        item.setIcon(0, QIcon(os.path.join(self.theme["path"], mood + ".png")))
+
+        if user in self.friends.keys():
+            if mood.lower() != "offline":  
+                self.online.add(user)
+            else:
+                app.online.remove(user)            
+            
+            item = self.gui.getFriendItem(user)
+            item.setIcon(QIcon(os.path.join(self.theme["path"], mood + ".png")))
+            self.gui.friendsModel.update()
+            
         if self.gui.tabWindow:
             if user in self.gui.tabWindow.users:
                 self.pm_received(fmt_mood_msg(self, mood, user), user)
@@ -121,7 +132,7 @@ class App(QApplication):
         #Called on connection, use GETMOOD command in #pesterchum
         #To request moods of users
         online = set(self.friends.keys()).intersection(self.names_list["#pesterchum"])
-        self.online.extend(online)
+        self.online.union(online)
         msg = "GETMOOD {}".format("".join(online))
         self.send_msg(msg, user="#pesterchum")
 
@@ -133,29 +144,16 @@ class App(QApplication):
         #Process a message, to user / channel
         process_send_msg(self, msg, user=user)
 
-    def send(self, msg):
-        bargs = []
-        for arg in args:
-            if isinstance(arg, str):
-                bargs.append(arg.encode())
-            elif isinstance(arg, bytes):
-                bargs.append(arg)
-            else:
-                raise cmdhandler.IRCClientError('Refusing to send one of the args from provided: %s'
-                                     % repr([(type(arg), arg) for arg in args]))
-
-        msg = b" ".join(bargs)
-        self.client.send(msg + b"\r\n")    
-
     def msg_received(self, msg):
         msgs = msg.split("\n")
-        msg2 = msg
+        wholemsg = msg
         for msg in msgs:
+            #print(msg)
             if msg.strip():
                 try:
                     prefix, command, args = parse.parse_raw_irc_command(msg)
                 except IndexError:
-                    print(msg2)
+                    raise exceptions.IncompleteMessageError(wholemsg)
                 if prefix:
                     prefix = parse.parse_nick(prefix.decode())[0]
                 try:
@@ -199,7 +197,7 @@ class App(QApplication):
                 index = self.gui.chumsTree.indexOfTopLevelItem(item)
                 self.gui.chumsTree.takeTopLevelItem(index)
             else:
-                index = self.gui.chumsTree.indexOfTopLevelItem(self.app.gui.getFriendItem(user)[0])
+                index = self.gui.chumsTree.indexOfTopLevelItem(self.app.gui.getFriendItem(user))
                 self.gui.chumsTree.takeTopLevelItem(index)
             del self.friends[user]
 
@@ -216,7 +214,7 @@ class App(QApplication):
         #A little glitchy
         #Restart connection on connection lost
         self.connected = False
-        self.client.send("QUIT :Disconnected\r\n")
+        self.client.send("QUIT :Client exited\r\n")
         self.client.transport.close()
         self.client = Client(self.loop, self.gui, self)
         coro = self.loop.create_connection(lambda: self.client, self.host, self.port)

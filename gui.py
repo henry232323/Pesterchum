@@ -1,6 +1,8 @@
 from PyQt5.QtWidgets import *
-from PyQt5.QtGui import QIcon, QFont, QTextCursor, QPixmap, QColor, QDesktopServices
-from PyQt5.QtCore import Qt, pyqtSlot, QUrl
+from PyQt5.QtGui import QIcon, QFont, QTextCursor, \
+     QPixmap, QColor, QDesktopServices, \
+     QStandardItemModel, QStandardItem
+from PyQt5.QtCore import Qt, pyqtSlot, QUrl, QModelIndex, QVariant
 from PyQt5 import uic
 
 import os.path, json
@@ -35,7 +37,6 @@ class Gui(QMainWindow):
         #Make window movable from 'Pesterchum' label, for lack of Title Bar
         self.appLabel.mousePressEvent = self.label_mousePressEvent
         self.appLabel.mouseMoveEvent = self.label_mouseMoveEvent
-        self.nameButton.setText(self.app.nick)
         
         #Set window info
         self.setWindowTitle('Pesterchum')
@@ -47,20 +48,30 @@ class Gui(QMainWindow):
         #Initialize Buttons
         initialize_buttons(self)
 
-        #Create a QTreeWidgetItem for each friend and add it to the chumsTree dropdown
-        #Assume by default they are offline
-        for item in self.friends.keys():
-            #if (self.app.options["chum_list"]["hide_offline_chums"] and item in self.app.names_list) or not self.app.options["chum_list"]["hide_offline_chums"]:
-            treeitem = QTreeWidgetItem()
-            treeitem.setText(0, item)
-            treeitem.setIcon(0, QIcon(self.theme["path"] + "/offline.png"))
-            self.chumsTree.addTopLevelItem(treeitem)
+        #Create QStandardItemModel for QTreeView
+        self.friendsModel = self.FriendsModel(self.app)
+        self.friendsItems = dict()
 
+        #Create a QStandardItem for each friend, friendsModel will auto update
+        #Assume by default they are offline
+        for friend in self.friends.keys():
+            treeitem = QStandardItem(friend)
+            treeitem.setText(friend)
+            treeitem.setIcon(QIcon(self.theme["path"] + "/offline.png"))
+            self.friendsModel.appendRow(treeitem)
+            self.friendsItems[friend] = treeitem
+
+        self.friendsModel.sort(0)
+        self.chumsTree.setModel(self.friendsModel)
         self.chumsTree.setContextMenuPolicy(Qt.CustomContextMenu)
         self.chumsTree.customContextMenuRequested.connect(self.openChumsMenu)
+        self.chumsTree.setSelectionMode(QTreeView.SingleSelection)
+        self.chumsTree.setSelectionBehavior(QTreeView.SelectRows)
+        self.chumsTree.setExpandsOnDoubleClick(True)
+        self.chumsTree.setItemsExpandable(True)
 
         #Open new private message on doubleclick
-        self.chumsTree.itemDoubleClicked.connect(self.open_privmsg)
+        self.chumsTree.doubleClicked.connect(self.open_privmsg)
         self.pesterButton.clicked.connect(self.privmsg_pester)
         self.blockButton.clicked.connect(self.block_selected)
 
@@ -69,6 +80,10 @@ class Gui(QMainWindow):
 
         #Set background of Color button to current color
         self.colorButton.setStyleSheet('background-color:' + self.color)
+        
+        #Name Button
+        self.nameButton.setText(self.app.nick)
+        self.nameButton.clicked.connect(self.openSwitchDialog)
         
         self.show()
 
@@ -107,7 +122,6 @@ class Gui(QMainWindow):
     def openBug(self):
         QDesktopServices.openUrl(QUrl("https://github.com/henry232323/Pesterchum/issues"))
 
-
     def remove_chum(self):
         items = self.chumsTree.selectedItems()
         if items:
@@ -126,9 +140,9 @@ class Gui(QMainWindow):
         else:
             return self.tabWindow.add_user(user)
 
-    @pyqtSlot(QTreeWidgetItem)
-    def open_privmsg(self, item):
-        user = item.text(0)
+    @pyqtSlot(QModelIndex)
+    def open_privmsg(self, itemindex):
+        user = self.friendsModel.data(itemindex)
         self.start_privmsg(user)
         self.tabWindow.raise_()
         self.tabWindow.activateWindow()
@@ -142,9 +156,10 @@ class Gui(QMainWindow):
 
     def privmsg_pester(self):
         '''Opens selected user in tree when PESTER! button pressed, same as double click'''
-        selected = self.chumsTree.selectedItems()
+        selected = self.chumsTree.selectedIndexes()
         if selected:
-            user = selected[0].text(0)
+            idx = selected[0]
+            user = self.friendsModel.data(idx)
             self.start_privmsg(user)
             self.tabWindow.raise_()
             self.tabWindow.activateWindow()
@@ -156,9 +171,10 @@ class Gui(QMainWindow):
             user = selected[0].text(0)
             if user in self.app.friends.keys():
                 if user not in self.app.blocked:
-                    index = self.app.gui.chumsTree.indexOfTopLevelItem(self.app.gui.getFriendItem(user)[0])
+                    index = self.app.gui.chumsTree.indexOfTopLevelItem(self.getFriendItem(user)[0])
                     self.app.gui.chumsTree.takeTopLevelItem(index)
             self.app.add_blocked(user)
+            
     def color_picker(self):
         '''Open color picker dialog, change current user color and change colorButton background'''
         color = QColorDialog.getColor()
@@ -168,6 +184,9 @@ class Gui(QMainWindow):
     def make_setMood(self, button):
         '''Makes set mood button for each button, each button deselects all others and sets user mood'''
         def setMood():
+            if not button.isChecked():
+                button.setChecked(True)
+                return
             for num, moodButton in self.mood_buttons.items():
                 if button == moodButton:
                     mood_name = self.app.moods.getName(num)
@@ -179,8 +198,7 @@ class Gui(QMainWindow):
 
     def getFriendItem(self, name):
         '''Get the tree item in the chumsTree from a name'''
-        item = self.chumsTree.findItems(name, Qt.MatchContains, 0)
-        return item
+        return self.friendsItems[name]
 
     #Methods for moving window
     @pyqtSlot()
@@ -195,3 +213,18 @@ class Gui(QMainWindow):
         y_w = self.offset.y()
         self.move(x-x_w, y-y_w)
         
+    class FriendsModel(QStandardItemModel):
+        def __init__(self, app, parent=None):
+            QStandardItemModel.__init__(self, parent)
+            self.app = app
+            self.header_labels = ["Chums ({}/{})".format(len(self.app.online), len(self.app.friends))]
+
+        def headerData(self, section, orientation, role=Qt.DisplayRole):
+            self.header_labels = ["Chums ({}/{})".format(len(self.app.online), len(self.app.friends))]
+            if role == Qt.DisplayRole and orientation == Qt.Horizontal:
+                return self.header_labels[section]
+            return QStandardItemModel.headerData(self, section, orientation, role)
+
+        def update(self):
+            a = self.setHeaderData(0, Qt.Orientation(1),
+                               QVariant("Chums ({}/{})".format(len(self.app.online), len(self.app.friends))))

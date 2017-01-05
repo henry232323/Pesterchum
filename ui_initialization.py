@@ -83,26 +83,12 @@ def initialize_menu(self):
     self.blockContext.triggered.connect(self.block_selected)
 
 def initialize_buttons(self):
-    #Make dictionary of all current mood buttons, manual for now
-    self.mood_buttons = {self.chummyButton.text():self.chummyButton,
-                             self.prankyButton.text():self.prankyButton,
-                             self.pleasantButton.text():self.pleasantButton,
-                             self.smoothButton.text():self.smoothButton,
-                             self.distraughtButton.text():self.distraughtButton,
-                             self.rancorousButton.text():self.rancorousButton,
-                             self.abscondButton.text():self.abscondButton}
-    #Set stylesheet and set an action for every defined mood button
-    #In the dictionary, give it the corresponding Icon
-    for name, button in self.mood_buttons.items():
-        button.setIcon(QIcon(os.path.join(self.theme["path"], name + ".png")))
-        button.clicked.connect(self.make_setMood(button))
-
-
-def initialize_buttons(self):
     self.nameButton.setIcon(QIcon(self.theme["path"] + "/chummy.png"))
     #Make color picker open on opening of the Color Button
     self.colorButton.clicked.connect(self.color_picker)
     self.mood_buttons = dict()
+    #Set stylesheet and set an action for every defined mood button
+    #In the dictionary, give it the corresponding Icon
     for num in range(23):
         name = "moodButton{}".format(num)
         if hasattr(self, name):
