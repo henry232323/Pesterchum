@@ -24,13 +24,11 @@ class Commands:
         user = user.decode() if type(user) == bytes else user
         if user in app.friends.keys():
             app.changeUserMood(user, 0)
-            app.online.append(user)
 
     def quit(app, user, channel, *args):
         user = user.decode() if type(user) == bytes else user
         if user in app.friends.keys():
             app.changeUserMood(user, "OFFLINE")
-            app.online.remove(user)
 
     def privmsg(app, user, channel, *args):
         channel = channel.decode()
@@ -40,15 +38,14 @@ class Commands:
         if (channel == "#pesterchum") and (b"GETMOOD" in args[-1]) and (app.nick.encode() in args[-1]):
             app.send_msg("MOOD >{}".format(app.moods.value), user="#pesterchum")
         #Check for MOOD message from someone we know
-        if (channel == "#pesterchum") and (user in app.online) and b"MOOD" in args[-1]:
+        if (channel == "#pesterchum") and b"MOOD" in args[-1]:
             if message.startswith("MOOD >"):
                 mood = message[6:]
                 #If it is a mood, parse
                 mood = mood.strip()
                 mood = int(mood.strip())
-                #If its a friend, set that users mood
-                if user in app.friends.keys():
-                    app.changeUserMood(user, mood)        
+                #Set that users mood
+                app.changeUserMood(user, mood)
             
         #If a PM to us, display message / check if COLOR command
         if channel == app.nick:

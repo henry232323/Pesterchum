@@ -115,6 +115,7 @@ class SwitchDialog(QDialog):
         uic.loadUi(parent.theme["ui_path"] + "/SwitchDialog.ui", self)
         self.app = app
         self.setWindowTitle('Switch')
+        self.setWindowIcon(QIcon("resources/pc_chummy.png"))
         self.proceedButton.clicked.connect(self.accepted)
         self.cancelButton.clicked.connect(self.close)
         self.deleteProfileButton.clicked.connect(self.delete_profile)
