@@ -9,11 +9,8 @@ Pictures borrowed from illuminatedWax's version found [here](https://github.com/
 
 
 ###TODO:
-- CURRENT USERS
-- USERLIST
-- Disconnected blocking dialog
-- Add in window config
+- Disconnected blocking dialog / connecting dialog
 - Add Memos
-- Regularize custom themes
+- Regularize custom themes (Added some support, still needs work)
 - Maybe recreate some themes?
 - Quirks!
