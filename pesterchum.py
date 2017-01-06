@@ -126,7 +126,19 @@ class App(QApplication):
             item = self.gui.getFriendItem(user)
             item.setIcon(QIcon(os.path.join(self.theme["path"], mood + ".png")))
             self.gui.friendsModel.update()
-            
+
+            if mood.lower() != "offline":
+                index = self.gui.friendsModel.indexFromItem(item)
+                a = self.gui.chumsTree.setRowHidden(index.row(),
+                                                self.gui.friendsModel.parent(index),
+                                                False)
+            else:
+                index = self.gui.friendsModel.indexFromItem(item)
+                a = self.gui.chumsTree.setRowHidden(index.row(),
+                                                self.gui.friendsModel.parent(index),
+                                                self.options["chum_list"]["hide_offline_chums"])
+            self.gui.drawTree()
+                
         if self.gui.tabWindow:
             if user in self.gui.tabWindow.users:
                 self.pm_received(fmt_mood_msg(self, mood, user), user)
@@ -262,6 +274,10 @@ class App(QApplication):
         part = "PART #pesterchum\r\n"
         self.client.send(part)
         self.lowBandwidth = True
+
+    def options_changed(self):
+        self.toggleLowBandwidth()
+        self.gui.drawTree()
 
     def toggleLowBandwidth(self):
         try:
