@@ -50,7 +50,6 @@ class Gui(QMainWindow):
         #Create QStandardItemModel for QTreeView
         self.friendsModel = self.FriendsModel(self.app)
         self.friendsItems = dict()
-
         #Create a QStandardItem for each friend, friendsModel will auto update
         #Assume by default they are offline
         for friend in self.friends.keys():
@@ -60,6 +59,7 @@ class Gui(QMainWindow):
             self.friendsModel.appendRow(treeitem)
             self.friendsItems[friend] = treeitem
 
+        self.drawTree()
         self.friendsModel.sort(0)
         self.chumsTree.setModel(self.friendsModel)
         self.chumsTree.setContextMenuPolicy(Qt.CustomContextMenu)
@@ -211,7 +211,20 @@ class Gui(QMainWindow):
         x_w = self.offset.x()
         y_w = self.offset.y()
         self.move(x-x_w, y-y_w)
-        
+
+    def drawTree(self):
+        if self.app.options["chum_list"]["hide_offline_chums"]:
+            for name, item in self.friendsItems.items():
+                if name not in self.app.online:
+                    index = self.friendsModel.indexFromItem(item)
+                    a = self.chumsTree.setRowHidden(index.row(),self.friendsModel.parent(index), True)
+        else:
+            for name, item in self.friendsItems.items():
+                if name not in self.app.online:
+                    index = self.friendsModel.indexFromItem(item)
+                    self.chumsTree.setRowHidden(index.row(),self.friendsModel.parent(index), False)
+            
+    
     class FriendsModel(QStandardItemModel):
         def __init__(self, app, parent=None):
             QStandardItemModel.__init__(self, parent)
