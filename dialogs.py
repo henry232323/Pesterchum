@@ -17,7 +17,7 @@ class PrivateMessageWidget(QWidget):
         '''
         super(__class__, self).__init__()
         self.parent = parent
-        uic.loadUi(self.parent.parent.theme["ui_path"] + "/PrivateMessageWidget.ui", self)
+        uic.loadUi(app.theme["ui_path"] + "/PrivateMessageWidget.ui", self)
         self.user = user
         self.app = app
         self.userLabel.setText(user.join(["::", "::"]))
@@ -57,7 +57,7 @@ class TabWindow(QWidget):
         super(__class__, self).__init__()
         self.parent=parent
         self.app = app
-        uic.loadUi(parent.theme["ui_path"] + "/TabWindow.ui", self)
+        uic.loadUi(app.theme["ui_path"] + "/TabWindow.ui", self)
         self.users = []
         self.init_user = self.add_user(user)
         self.tabWidget.removeTab(0)#Remove two default tabs
@@ -112,7 +112,7 @@ class SwitchDialog(QDialog):
         '''
         super(__class__, self).__init__()
         self.parent = parent
-        uic.loadUi(parent.theme["ui_path"] + "/SwitchDialog.ui", self)
+        uic.loadUi(app.theme["ui_path"] + "/SwitchDialog.ui", self)
         self.app = app
         self.setWindowTitle('Switch')
         self.setWindowIcon(QIcon("resources/pc_chummy.png"))
@@ -400,10 +400,9 @@ class OptionsWindow(QWidget):
             self.options["interface"]["blink_taskbar_on_memos"] = self.blinkMemoBox.isChecked()
             self.options["interface"]["minimize"] = self.minimizeCombo.currentIndex()
             self.options["interface"]["close"] = self.closeCombo.currentIndex()
-            
-            self.app.change_theme(self.themesComboBox.currentText())
 
             self.app.options_changed()
+            self.app.change_theme(self.themesComboBox.currentText())
         except Exception as e:
             self.errorLabel.setText("Error changing theme: \n{}".format(e))
             self.app_change_theme(oldtheme)
@@ -418,3 +417,136 @@ class OptionsWindow(QWidget):
                     Button.setChecked(False)
                 
         return setIndex
+
+class MemosWindow(QWidget):
+    def __init__(self, app, parent):
+        super(__class__, self).__init__()
+        uic.loadUi(app.theme["ui_path"] + "/MemoWindow.ui", self)    
+        self.app = app
+        self.parent = parent
+        self.setWindowTitle('Memos')
+        self.setWindowIcon(QIcon("resources/pc_chummy.png"))
+        width = self.frameGeometry().width()
+        height = self.frameGeometry().height()
+        self.setFixedSize(width, height)
+        self.tabWindow = None
+        self.memosTableWidget.setColumnCount(2)
+        self.memosTableWidget.setHorizontalHeaderLabels(["Memo", "Users"])
+        self.memosTableWidget.doubleClicked.connect(self.openMemo)
+        header = self.memosTableWidget.horizontalHeader();
+        header.setSectionResizeMode(QHeaderView.Stretch);
+        ctr = 0
+        for memo, usercount in self.app.channel_list.items():
+            self.memosTableWidget.insertRow(ctr)
+            icn = QIcon(self.app.theme["path"] + "/memo.png")
+            mitem = QTableWidgetItem(icn,memo)
+            mitem.setFlags(Qt.ItemFlags(Qt.ItemIsSelectable) | Qt.ItemFlags(Qt.ItemIsEnabled))
+            uitem = QTableWidgetItem()
+            uitem.setData(0,usercount)
+            uitem.setTextAlignment(2)
+            uitem.setFlags(Qt.ItemFlags(Qt.ItemIsSelectable) | Qt.ItemFlags(Qt.ItemIsEnabled))
+            self.memosTableWidget.setItem(ctr,0,mitem)
+            self.memosTableWidget.setItem(ctr,1,uitem)
+            ctr += 1
+
+        self.show()
+
+    def openMemo(self, index):
+        try:
+            channel = self.memosTableWidget.itemFromIndex(index).text()
+            if not self.tabWindow:
+                self.tabWindow = MemoTabWindow(self.app, self, channel)
+                return self.tabWindow.init_memo
+            else:
+                return self.tabWindow.add_memo(channel)
+        except Exception as e:
+            print(e)
+
+class MemoMessageWidget(QWidget):
+    def __init__(self, app, container, parent, memo):
+        '''
+        The widget within each tab of TabWindow, a display
+        for new private messages and user input
+        '''
+        super(__class__, self).__init__()
+        self.parent = parent
+        uic.loadUi(app.theme["ui_path"] + "/MemoMessageWidget.ui", self)
+        self.user = memo
+        self.app = app
+        self.userLabel.setText(memo.join(["::", "::"]))
+        self.sendButton.clicked.connect(self.send)
+        self.userOutput.setReadOnly(True)
+        self.userOutput.setMouseTracking(True)
+        
+    def send(self):
+        '''Send the user the message in the userInput box, called on enter press / send button press'''
+        msg = self.userInput.text()
+        if msg:
+            memo = self.memo
+            self.app.send_msg(msg, user=memo)
+            self.userInput.setText("")
+            fmt = fmt_disp_msg(self.app, msg, user=self.app.nick)
+            self.display_text(fmt)
+
+    def display_text(self, msg):
+        '''Insert msg into the display box'''
+        cursor = self.userOutput.textCursor()
+        cursor.movePosition(QTextCursor.End)
+        self.userOutput.setTextCursor(cursor)
+        self.userOutput.insertHtml(msg)
+
+    def keyPressEvent(self, event):
+        '''Use enter key to send'''
+        if event.key() == Qt.Key_Return:
+            self.send()
+
+class MemoTabWindow(QWidget):
+    def __init__(self, app, parent, memo):
+        '''
+        A window for storing PrivateMessageWidget instances, a navigation
+        between current private message users
+        '''
+        super(__class__, self).__init__()
+        self.parent=parent
+        self.app = app
+        uic.loadUi(app.theme["ui_path"] + "/MemoTabWindow.ui", self)
+        self.memos = []
+        self.init_memo = self.add_memo(memo)
+        self.tabWidget.removeTab(0)#Remove two default tabs
+        self.tabWidget.removeTab(0)
+        self.tabWidget.setTabsClosable(True)
+        self.tabWidget.tabCloseRequested.connect(self.closeTab)
+        self.setWindowTitle("Private Message")
+        self.setWindowIcon(QIcon("resources/pc_chummy.png"))
+        self.show()
+
+    def closeTab(self, currentIndex):
+        widget = self.tabWidget.widget(currentIndex)
+        widget.deleteLater()
+        self.tabWidget.removeTab(currentIndex)
+        self.memos.remove(widget.memo)
+        if not self.memos:
+            self.close()
+
+    def closeEvent(self, event):
+        '''On window (or tab) close send a PESTERCHUM:CEASE message to each user, destroy self'''
+        try:
+            event.accept()
+            self.parent.tabWindow = None
+        except Exception as e:
+            print(e)
+    def add_memo(self, memo):
+        '''
+        Add a user & PrivateMessageWidget to window, check if it is already there
+        if so, return that user's PM, if not, create and return a PM
+        On PrivateMessageWidget creation, send a PESTERCHUM:BEGIN initiation message
+        '''
+        if not memo in self.memos:
+            windw = MemoMessageWidget(self.app, self.tabWidget, self, memo)
+            icon = QIcon("resources/pc_chummy.png")
+            a = self.tabWidget.addTab(windw, icon, memo)
+            tab = self.tabWidget.widget(a)
+            self.memos.append(memo)
+            return tab
+        else:
+            return self.tabWidget.widget(self.memos.index(memo))

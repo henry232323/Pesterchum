@@ -29,6 +29,7 @@ class App(QApplication):
         self.theme_name = None
         self.names_list = dict()
         self.online = set()
+        self.channel_list = dict()
 
         #Initialize imports
         self.config = Config
@@ -155,6 +156,9 @@ class App(QApplication):
         #Get a friend's mood
         self.send_msg("GETMOOD {}".format(user))
 
+    def send_list(self):
+        self.send_msg("LIST")
+
     def send_msg(self, msg, user=None):
         #Process a message, to user / channel
         process_send_msg(self, msg, user=user)
@@ -259,19 +263,20 @@ class App(QApplication):
                 tab = self.gui.start_privmsg(user)
                 tab.display_text(fmt_me_msg(self, "/me is now idle chum!", user=self.nick))
         
-    def join(self):
+    def join(self, channel="#pesterchum"):
         #Called once the MODE keyword is seen in received messages
         #Joins the #pesterchum channel
         #Gets all friends moods
-        join = "JOIN #pesterchum\r\n"
+        join = "JOIN {}\r\n".format(channel)
         self.client.send(join)
         self.connected = True
         self.lowBandwidth = False
+        self.send_list()
 
-    def part(self):
+    def part(self, channel="#pesterchum"):
         #Leaves #pesterchum
         #For low bandwidth mode, stops flood of moods
-        part = "PART #pesterchum\r\n"
+        part = "PART {}\r\n".format(channel)
         self.client.send(part)
         self.lowBandwidth = True
 
