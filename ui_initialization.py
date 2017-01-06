@@ -18,6 +18,11 @@ def initialize_menu(self):
     self.optionsAction.triggered.connect(self.openOptions)
     self.clientMenu.addAction(self.optionsAction)
 
+    #Create MEMOS button in 'CLIENT' menu
+    self.openMemos = QAction("MEMOS",self)
+    self.openMemos.triggered.connect(self.openMemosWindow)
+    self.clientMenu.addAction(self.openMemos)
+
     #Create USERLIST button in 'CLIENT' menu
     self.userlistAction = QAction("USERLIST",self)
     self.userlistAction.triggered.connect(self.openUserList)

@@ -109,6 +109,9 @@ class Gui(QMainWindow):
     def openOptions(self):
         self.userList = OptionsWindow(self.app, self)
 
+    def openMemosWindow(self):
+        self.memosWindow = MemosWindow(self.app, self)
+
     def openCalspritePM(self):
         self.start_privmsg("calSprite")
 
@@ -120,7 +123,7 @@ class Gui(QMainWindow):
 
     def openBug(self):
         QDesktopServices.openUrl(QUrl("https://github.com/henry232323/Pesterchum/issues"))
-
+        
     def remove_chum(self):
         items = self.chumsTree.selectedItems()
         if items:

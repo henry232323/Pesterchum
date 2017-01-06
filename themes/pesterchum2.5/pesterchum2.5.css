@@ -246,7 +246,7 @@
 .QPushButton#acceptButton, .QPushButton#rejectButton,
 .QPushButton#addBlockButton, .QPushButton#removeBlockButton,
 .QPushButton#closeUserlist, .QPushButton#connectingExitButton,
-.QPushButton#refreshThemeButton{
+.QPushButton#refreshThemeButton, .QPushButton#cancelMemoButton, .QPushButton#joinMemoButton {
 	background-color: #fdb302;
 	font-family: Courier New;
 }
@@ -311,4 +311,28 @@
 }
 .OptionsWindow .QPushButton[checkable="true"]::selected{
 	font-family: Courier New;
+}
+.MemosWindow{
+	background-color: #fdb302;
+	font-family: Courier New;
+}
+.QLineEdit#timeframeDisplayLine, .QLineEdit#memoNameLineEdit{
+	background-color: #fdb302;
+	border: 1px solid black;
+	selection-background-color: gray;	
+}
+.QTableWidget#memosTableWidget{
+	background-color: black;
+	border: 2px solid yellow;
+}
+.QTableWidget::item{
+	color: white;
+	font: bold;
+	height: 5px;
+}
+.QTableWidget::item::selected, .QTableWidget::item::selected::hover{
+	background-color: gray;
+}
+.QTableWidget::item::hover{
+	background-color: rgb(200,200,200,50);
 }

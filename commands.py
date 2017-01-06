@@ -76,3 +76,12 @@ class Commands:
     def endofnames(app, user, channel, *args):
         if args[-2] == b"#pesterchum":
             app.getFriendsMoods()
+
+    def liststart(app, server, handle, *info):
+        app.channel_field = info.index(b"Channel")
+        app.channel_list = dict()
+        
+    def list(app, server, handle, *info):
+        channel = info[app.channel_field].decode()
+        if channel != "#pesterchum":
+            app.channel_list[channel] = int(info[1].decode())
