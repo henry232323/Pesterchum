@@ -24,6 +24,8 @@ class Gui(QMainWindow):
         #Set current PM window and Connecting to none
         self.tabWindow = None
         self.connectingDialog = None
+        self.memoTabWindow = None
+        self.memosWindow = None
 
     def initialize(self):
         '''Initialize GUI creation'''

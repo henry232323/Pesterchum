@@ -4,6 +4,8 @@ from datetime import datetime
 from formatting import *
 from oyoyo import parse
 
+from PyQt5.QtCore import pyqtSignal
+
 def process_commands(*args):
     pass
 
@@ -35,20 +37,21 @@ class Commands:
         message = args[-1].decode()
         user = user.decode() if type(user) == bytes else user
         #If a GETMOOD message to #pesterchum (not a PM with GETMOOD in it) send our mood
-        if (channel == "#pesterchum") and (b"GETMOOD" in args[-1]) and (app.nick.encode() in args[-1]):
-            app.send_msg("MOOD >{}".format(app.moods.value), user="#pesterchum")
-        #Check for MOOD message from someone we know
-        if (channel == "#pesterchum") and b"MOOD" in args[-1]:
-            if message.startswith("MOOD >"):
-                mood = message[6:]
-                #If it is a mood, parse
-                mood = mood.strip()
-                mood = int(mood.strip())
-                #Set that users mood
-                app.changeUserMood(user, mood)
+        if channel == "#pesterchum":
+            if(b"GETMOOD" in args[-1]) and (app.nick.encode() in args[-1]):
+                app.send_msg("MOOD >{}".format(app.moods.value), user="#pesterchum")
+            #Check for MOOD message from someone we know
+            elif b"MOOD" in args[-1]:
+                if message.startswith("MOOD >"):
+                    mood = message[6:]
+                    #If it is a mood, parse
+                    mood = mood.strip()
+                    mood = int(mood.strip())
+                    #Set that users mood
+                    app.changeUserMood(user, mood)
             
         #If a PM to us, display message / check if COLOR command
-        if channel == app.nick:
+        elif channel == app.nick:
             #If COLOR command, parse and set that user's color
             if "COLOR >" in message:
                 colors = message.strip("COLOR >").split(",")
@@ -58,6 +61,11 @@ class Commands:
                 fmt = fmt_disp_msg(app, message, user=user)
                 if fmt:
                     app.pm_received(fmt, user)
+
+        else:
+            fmt = fmt_disp_memo(app, message, user)
+            if fmt:
+                app.memo_received(fmt, channel)
 
     def welcome(app, user, channel, *args):
         app.join()
@@ -70,12 +78,15 @@ class Commands:
                 app.names_list[channel] = set()
             names = set(map(bytes.decode, args[-1].split()))
             app.names_list[channel].update(names)
+            
         except IndexError as e:
             print(user, channel, *args)
 
     def endofnames(app, user, channel, *args):
         if args[-2] == b"#pesterchum":
             app.getFriendsMoods()
+        else:
+            app.memo_add_names(args[-2].decode())
 
     def liststart(app, server, handle, *info):
         app.channel_field = info.index(b"Channel")
@@ -84,4 +95,18 @@ class Commands:
     def list(app, server, handle, *info):
         channel = info[app.channel_field].decode()
         if channel != "#pesterchum":
-            app.channel_list[channel] = int(info[1].decode())
+            ucount = int(info[1].decode())
+            app.channel_list[channel] = ucount
+            app.receive_list(channel, ucount)
+
+    noticeSignal = pyqtSignal()
+    pingSignal = pyqtSignal()
+    joinSignal = pyqtSignal()
+    quitSignal = pyqtSignal()
+    privmsgSignal = pyqtSignal()
+    welcomeSignal = pyqtSignal()
+    namereplySignal = pyqtSignal()
+    endofnamesSignal = pyqtSignal()
+    liststartSignal = pyqtSignal()
+    listSignal = pyqtSignal()
+    nameSignal = pyqtSignal()
