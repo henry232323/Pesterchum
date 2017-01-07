@@ -328,11 +328,36 @@
 .QTableWidget::item{
 	color: white;
 	font: bold;
-	height: 5px;
 }
 .QTableWidget::item::selected, .QTableWidget::item::selected::hover{
 	background-color: gray;
 }
 .QTableWidget::item::hover{
 	background-color: rgb(200,200,200,50);
+}
+.MemoTabWindow{
+	background-color: #ffb500;
+}
+.QListWidget#memoUsers{
+	background-color: white;
+	color: black;
+	font-family: Courier New;
+}
+.QListWidget#memoUsers::item{
+	color: black;
+	font-family: Courier New;
+}
+.QSlider::handle:horizontal {
+	background-color: #ffb500;
+	border: 1px solid black;
+	
+}
+.QPushButton#memoCloseButton, .QPushButton#memoGoButton{
+	text-align: center;
+	background-color:yellow;
+	border-color:#BB8800;
+	border-style:solid;
+	border-width:2px;
+	font-family: Courier New;
+	padding: 5px 0px 5px 0px;
 }

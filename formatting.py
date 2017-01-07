@@ -136,3 +136,13 @@ def getTime(app):
                 minute=str(time.minute).zfill(2),
                 sec=str(time.second).zfill(2))
     return ftime
+
+def fmt_memo_msg(app, msg, user):
+    return "<c={color}>{initials}: {msg}</c>".format(
+        initials=getInitials(app, user, b=False, c=False),
+        color=app.getColor(user),
+        msg=msg)
+
+def fmt_disp_memo(app, message, user):
+    msg = "<b>{}<b><br />".format(color_to_span(message))
+    return msg

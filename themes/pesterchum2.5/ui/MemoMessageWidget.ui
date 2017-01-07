@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>Form</class>
- <widget class="QWidget" name="Form">
+ <class>MemoMessageWidget</class>
+ <widget class="QWidget" name="MemoMessageWidget">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -128,7 +128,7 @@
        </layout>
       </item>
       <item>
-       <widget class="QListWidget" name="memoUserList">
+       <widget class="QListWidget" name="memoUsers">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
           <horstretch>0</horstretch>

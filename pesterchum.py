@@ -156,8 +156,16 @@ class App(QApplication):
         #Get a friend's mood
         self.send_msg("GETMOOD {}".format(user))
 
+    def memo_add_names(self, channel):
+        if self.gui.memoTabWindow:
+            self.gui.memoTabWindow.add_names(channel, self.names_list[channel])
+            
     def send_list(self):
         self.send_msg("LIST")
+
+    def receive_list(self, channel, usercount):
+        if self.gui.memosWindow:
+            self.gui.memosWindow.add_channel(channel, usercount)
 
     def send_msg(self, msg, user=None):
         #Process a message, to user / channel
@@ -196,6 +204,13 @@ class App(QApplication):
         #Called when PM is closed or receive PESTERCHUM:CEASE
         pass
 
+    def memo_received(self, msg, memo):
+        if self.gui.memoTabWindow:
+            tab = self.gui.memoTabWindow.getWidget(memo)
+            if tab:
+                tab.display_text(msg)
+            
+            
     def add_friend(self, user):
         #Called when the ADD [CHUM] button is clicked and the dialog is answered
         #Add the user to self.friends, get the users color (probably doesnt have)
@@ -271,7 +286,6 @@ class App(QApplication):
         self.client.send(join)
         self.connected = True
         self.lowBandwidth = False
-        self.send_list()
 
     def part(self, channel="#pesterchum"):
         #Leaves #pesterchum

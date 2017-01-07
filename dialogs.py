@@ -8,6 +8,7 @@ from types import MethodType
 
 from themes import *
 from messages import *
+from formatting import fmt_memo_msg
 
 class PrivateMessageWidget(QWidget):
     def __init__(self, app, container, parent, user):
@@ -429,38 +430,42 @@ class MemosWindow(QWidget):
         width = self.frameGeometry().width()
         height = self.frameGeometry().height()
         self.setFixedSize(width, height)
-        self.tabWindow = None
         self.memosTableWidget.setColumnCount(2)
         self.memosTableWidget.setHorizontalHeaderLabels(["Memo", "Users"])
         self.memosTableWidget.doubleClicked.connect(self.openMemo)
         header = self.memosTableWidget.horizontalHeader();
         header.setSectionResizeMode(QHeaderView.Stretch);
-        ctr = 0
-        for memo, usercount in self.app.channel_list.items():
-            self.memosTableWidget.insertRow(ctr)
-            icn = QIcon(self.app.theme["path"] + "/memo.png")
-            mitem = QTableWidgetItem(icn,memo)
-            mitem.setFlags(Qt.ItemFlags(Qt.ItemIsSelectable) | Qt.ItemFlags(Qt.ItemIsEnabled))
-            uitem = QTableWidgetItem()
-            uitem.setData(0,usercount)
-            uitem.setTextAlignment(2)
-            uitem.setFlags(Qt.ItemFlags(Qt.ItemIsSelectable) | Qt.ItemFlags(Qt.ItemIsEnabled))
-            self.memosTableWidget.setItem(ctr,0,mitem)
-            self.memosTableWidget.setItem(ctr,1,uitem)
-            ctr += 1
+        self.ctr = 0
+        self.app.send_list()
 
         self.show()
 
     def openMemo(self, index):
-        try:
-            channel = self.memosTableWidget.itemFromIndex(index).text()
-            if not self.tabWindow:
-                self.tabWindow = MemoTabWindow(self.app, self, channel)
-                return self.tabWindow.init_memo
-            else:
-                return self.tabWindow.add_memo(channel)
-        except Exception as e:
-            print(e)
+        channel = self.memosTableWidget.itemFromIndex(index).text()
+        if not self.app.gui.memoTabWindow:
+            self.app.gui.memoTabWindow = MemoTabWindow(self.app, self, channel)
+            self.close()
+            return self.app.gui.memoTabWindow.init_memo
+        else:
+            self.close()
+            return self.app.gui.memoTabWindow.add_memo(channel)
+
+    def add_channel(self, memo, usercount):
+        self.memosTableWidget.insertRow(self.ctr)
+        icn = QIcon(self.app.theme["path"] + "/memo.png")
+        mitem = QTableWidgetItem(icn,memo)
+        mitem.setFlags(Qt.ItemFlags(Qt.ItemIsSelectable) | Qt.ItemFlags(Qt.ItemIsEnabled))
+        uitem = QTableWidgetItem()
+        uitem.setData(0,usercount)
+        uitem.setTextAlignment(2)
+        uitem.setFlags(Qt.ItemFlags(Qt.ItemIsSelectable) | Qt.ItemFlags(Qt.ItemIsEnabled))
+        self.memosTableWidget.setItem(self.ctr,0,mitem)
+        self.memosTableWidget.setItem(self.ctr,1,uitem)
+        self.ctr += 1
+
+    def closeEvent(self, event):
+        event.accept()
+        self.app.gui.memosWindow = None
 
 class MemoMessageWidget(QWidget):
     def __init__(self, app, container, parent, memo):
@@ -471,22 +476,29 @@ class MemoMessageWidget(QWidget):
         super(__class__, self).__init__()
         self.parent = parent
         uic.loadUi(app.theme["ui_path"] + "/MemoMessageWidget.ui", self)
-        self.user = memo
+        self.memo = memo
         self.app = app
         self.userLabel.setText(memo.join(["::", "::"]))
         self.sendButton.clicked.connect(self.send)
         self.userOutput.setReadOnly(True)
         self.userOutput.setMouseTracking(True)
+        self.app.join(channel=memo)
         
     def send(self):
         '''Send the user the message in the userInput box, called on enter press / send button press'''
         msg = self.userInput.text()
         if msg:
             memo = self.memo
-            self.app.send_msg(msg, user=memo)
+            sendmsg = fmt_memo_msg(self.app, msg, user=self.app.nick)
+            disp = fmt_disp_memo(self.app, sendmsg, user=self.app.nick)
+            self.app.send_msg(sendmsg, user=memo)
             self.userInput.setText("")
-            fmt = fmt_disp_msg(self.app, msg, user=self.app.nick)
-            self.display_text(fmt)
+            self.display_text(disp)
+            
+    def add_names(self, names):
+        names = list(names)
+        for item in names:
+            self.memoUsers.addItem(item)
 
     def display_text(self, msg):
         '''Insert msg into the display box'''
@@ -516,8 +528,9 @@ class MemoTabWindow(QWidget):
         self.tabWidget.removeTab(0)
         self.tabWidget.setTabsClosable(True)
         self.tabWidget.tabCloseRequested.connect(self.closeTab)
-        self.setWindowTitle("Private Message")
+        self.setWindowTitle("Memos")
         self.setWindowIcon(QIcon("resources/pc_chummy.png"))
+        self.app.gui.memoTabWindow = self
         self.show()
 
     def closeTab(self, currentIndex):
@@ -525,16 +538,28 @@ class MemoTabWindow(QWidget):
         widget.deleteLater()
         self.tabWidget.removeTab(currentIndex)
         self.memos.remove(widget.memo)
+        self.app.part(channel=widget.memo)
         if not self.memos:
             self.close()
 
     def closeEvent(self, event):
         '''On window (or tab) close send a PESTERCHUM:CEASE message to each user, destroy self'''
-        try:
-            event.accept()
-            self.parent.tabWindow = None
-        except Exception as e:
-            print(e)
+        for memo in self.memos:
+            self.app.part(channel=memo)
+        event.accept()
+        self.app.gui.memoTabWindow = None
+
+    def add_names(self, memo, names):
+        if memo in self.memos:
+            tab = self.getWidget(memo)
+            tab.add_names(names)
+
+    def getWidget(self, memo):
+        if memo in self.memos:
+            return self.tabWidget.widget(self.memos.index(memo))
+        else:
+            return None
+            
     def add_memo(self, memo):
         '''
         Add a user & PrivateMessageWidget to window, check if it is already there
@@ -543,10 +568,10 @@ class MemoTabWindow(QWidget):
         '''
         if not memo in self.memos:
             windw = MemoMessageWidget(self.app, self.tabWidget, self, memo)
-            icon = QIcon("resources/pc_chummy.png")
+            icon = QIcon(self.app.theme["path"] + "/memo.png")
             a = self.tabWidget.addTab(windw, icon, memo)
             tab = self.tabWidget.widget(a)
             self.memos.append(memo)
             return tab
         else:
-            return self.tabWidget.widget(self.memos.index(memo))
+            return self.getWidget(memo)
