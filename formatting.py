@@ -77,7 +77,7 @@ def fmt_color(color):
     else:
         return "COLOR >{},{},{}".format(*rgb(color, type=tuple))
 
-def getInitials(app, user, b=True, c=False, suffix=None):
+def getInitials(app, user, b=True, c=False, suffix=None, prefix=None):
     '''
     Get colored or uncolored, bracketed or unbracketed initials with
     or without a suffix using a Chumhandle. A suffix being a me style
@@ -90,6 +90,8 @@ def getInitials(app, user, b=True, c=False, suffix=None):
     init += char
     if suffix:
         init =+ suffix
+    if prefix:
+        init = prefix + init
     if b:
         fin = "[" + init + "]"
     else:
@@ -137,12 +139,59 @@ def getTime(app):
                 sec=str(time.second).zfill(2))
     return ftime
 
+def fmt_color_wrap(msg, color):
+    fmt = "<span style=\"color:{color}\">{msg}</span>"
+    return fmt.format(msg=msg, color=color)
+
 def fmt_memo_msg(app, msg, user):
     return "<c={color}>{initials}: {msg}</c>".format(
         initials=getInitials(app, user, b=False, c=False),
         color=app.getColor(user),
         msg=msg)
 
-def fmt_disp_memo(app, message, user):
-    msg = "<b>{}<b><br />".format(color_to_span(message))
+def fmt_disp_memo(app, message, user, prefix=""):
+    msg = "<b>{msg}<b><br />".format(
+        prefix=prefix,
+        msg=color_to_span(message))
     return msg
+
+def fmt_memo_join(app, user, time, memo, part=False, opened=False):
+    if part:
+        type = "responded to memo."
+    elif opened:
+        type = "opened memo on board OOWOO."
+    else:
+        type = "ceased responding to memo."
+    if time[0] == "i":
+        frame = "CURRENT"
+        fmt = "<b>{clr} <span style=\"color:#646464\">RIGHT NOW {type}</span></b><br />"
+        pfx = "C"
+        timefmt = ""
+        
+    else:
+        hours, minutes = time.split(":")
+        hours, minutes = int(hours), int(minutes)
+        if time[0] == "F":
+            frame = "FUTURE"
+            if hours:
+                timefmt = "{}:{} HOURS FROM NOW".format(hours, minutes)
+            else:
+                timefmt = "{} MINUTES FROM NOW".format(minutes)
+        elif time[0] == "P":
+            frame = "PAST"
+            if hours:
+                timefmt = "{}:{} HOURS AGO".format(hours, minutes)
+            else:
+                timefmt = "{} MINUTES AGO".format(minutes)
+        pfx = time[0]
+        fmt = "<b>{clr} <span style=\"color:#646464\">{time} {type}</span></b><br />"
+        
+    colorfmt = "<span style=\"color:{color}\">{frame} {user} {binit}</span>"
+    clr = colorfmt.format(color=app.getColor(user),
+                          frame=frame,
+                          user=user,
+                          binit=getInitials(app, user, prefix=pfx))
+
+    fin = fmt.format(clr=clr, time=timefmt, type=type)
+    return fin
+    

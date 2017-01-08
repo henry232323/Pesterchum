@@ -475,30 +475,40 @@ class MemoMessageWidget(QWidget):
         '''
         super(__class__, self).__init__()
         self.parent = parent
+        self.names = []
         uic.loadUi(app.theme["ui_path"] + "/MemoMessageWidget.ui", self)
         self.memo = memo
         self.app = app
+        self.times = dict()
+        self.time = 'i'
         self.userLabel.setText(memo.join(["::", "::"]))
         self.sendButton.clicked.connect(self.send)
         self.userOutput.setReadOnly(True)
         self.userOutput.setMouseTracking(True)
         self.app.join(channel=memo)
+        self.app.send_msg("PESTERCHUM:TIME>i", user=memo)
         
     def send(self):
         '''Send the user the message in the userInput box, called on enter press / send button press'''
-        msg = self.userInput.text()
-        if msg:
-            memo = self.memo
-            sendmsg = fmt_memo_msg(self.app, msg, user=self.app.nick)
-            disp = fmt_disp_memo(self.app, sendmsg, user=self.app.nick)
-            self.app.send_msg(sendmsg, user=memo)
-            self.userInput.setText("")
-            self.display_text(disp)
+        try:
+            msg = self.userInput.text()
+            if msg:
+                memo = self.memo
+                sendmsg = fmt_memo_msg(self.app, msg, self.app.nick)
+                disp = fmt_disp_memo(self.app, sendmsg, user=self.app.nick)
+                self.app.send_msg(sendmsg, user=memo)
+                self.userInput.setText("")
+                self.display_text(disp)
+        except Exception as e:
+            print(e)
             
     def add_names(self, names):
+        self.names = names
         names = list(names)
-        for item in names:
-            self.memoUsers.addItem(item)
+        for user in names:
+            itm = self.memoUsers.addItem(user)
+            if user.startswith("@"):
+                itm.setIcon(self.app.theme["path"] + "/op.png")
 
     def display_text(self, msg):
         '''Insert msg into the display box'''
@@ -511,6 +521,29 @@ class MemoMessageWidget(QWidget):
         '''Use enter key to send'''
         if event.key() == Qt.Key_Return:
             self.send()
+
+    def user_join(self, user):
+        if user not in self.names:
+            itm = self.memoUsers.addItem(user)
+            self.send_time()
+            if user.startswith("@"):
+                itm.setIcon(self.app.theme["path"] + "/op.png")
+
+        time = self.times[user] if user in self.times.keys() else "i"
+        join_msg = fmt_memo_join(self.app, user, time, self.memo, opened=True)
+        self.display_text(join_msg)
+
+    def user_part(self, user):
+        item = self.memoUsers.findItems(user, Qt.MatchFlags(Qt.MatchExactly))
+        row = self.memoUsers.row(item[0])
+        self.memoUsers.takeItem(row)
+        
+        time = self.times[user] if user in self.times.keys() else "i"
+        part_msg = fmt_memo_join(self.app, user, time, self.memo, part=True)
+        self.display_text(part_msg)
+
+    def send_time(self, time='i'):
+        self.app.send_msg("PESTERCHUM:TIME>{}".format(time), user=self.memo)
 
 class MemoTabWindow(QWidget):
     def __init__(self, app, parent, memo):
