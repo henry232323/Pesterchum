@@ -88,6 +88,10 @@ class Gui(QMainWindow):
         
         self.show()
 
+    def closeEvent(self, event):
+        event.accept()
+        self.app.exit()
+
     def openSwitchDialog(self):
         self.switchDialog = SwitchDialog(self.app, self)
 
