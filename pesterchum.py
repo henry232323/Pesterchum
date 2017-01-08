@@ -4,6 +4,7 @@ from PyQt5.QtCore import Qt, pyqtSignal
 from quamash import QEventLoop
 
 import asyncio, sys, os.path, json, re
+from inspect import isawaitable
 
 from gui import Gui
 from client import Client
@@ -65,8 +66,28 @@ class App(QApplication):
         self.client = Client(self.loop, self.gui, self)
         coro = self.loop.create_connection(lambda: self.client, self.host, self.port)
         asyncio.ensure_future(coro)
+
+        if "debug" in sys.argv:
+            self.cli()
+        
         self.gui.initialize()
         loop.run_forever()
+
+    def cli(self):
+        async def run_exe():
+            while True:
+                try:
+                    line = await self.loop.run_in_executor(None, input, ">>> ")
+                    evl = eval(line)
+                    if isawaitable(evl):
+                        r = await evl
+                        print(r)
+                    else:
+                        print(evl)
+                except Exception as e:
+                    print(e)
+        asyncio.ensure_future(run_exe())
+        
 
     def change_theme(self, theme):
         if theme != self.theme_name:

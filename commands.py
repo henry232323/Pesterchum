@@ -6,9 +6,6 @@ from oyoyo import parse
 
 from PyQt5.QtCore import pyqtSignal
 
-def process_commands(*args):
-    pass
-
 class Commands:
     def notice(app, nick, chan, msg):
         msg = msg.decode()
@@ -63,6 +60,7 @@ class Commands:
                     app.pm_received(fmt, user)
 
         else:
+            print(message, user)
             fmt = fmt_disp_memo(app, message, user)
             if fmt:
                 app.memo_received(fmt, channel)
