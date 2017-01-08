@@ -4,7 +4,6 @@ from PyQt5.QtCore import Qt, pyqtSlot
 from PyQt5 import uic
 
 import os.path, json, sys
-from types import MethodType
 
 from themes import *
 from messages import *
@@ -430,8 +429,8 @@ class MemosWindow(QWidget):
         self.memosTableWidget.setColumnCount(2)
         self.memosTableWidget.setHorizontalHeaderLabels(["Memo", "Users"])
         self.memosTableWidget.doubleClicked.connect(self.openMemo)
-        header = self.memosTableWidget.horizontalHeader();
-        header.setSectionResizeMode(QHeaderView.Stretch);
+        header = self.memosTableWidget.horizontalHeader()
+        header.setSectionResizeMode(QHeaderView.Stretch)
         self.ctr = 0
         self.app.send_list()
 
