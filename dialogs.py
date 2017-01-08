@@ -1,5 +1,5 @@
 from PyQt5.QtWidgets import *
-from PyQt5.QtGui import QIcon, QTextCursor, QStandardItem
+from PyQt5.QtGui import QIcon, QTextCursor, QStandardItem, QColor
 from PyQt5.QtCore import Qt, pyqtSlot
 from PyQt5 import uic
 
@@ -8,7 +8,7 @@ from types import MethodType
 
 from themes import *
 from messages import *
-from formatting import fmt_memo_msg
+from formatting import fmt_memo_msg, rgb
 
 class PrivateMessageWidget(QWidget):
     def __init__(self, app, container, parent, user):
@@ -268,21 +268,18 @@ class BlockedDialog(QDialog):
         dialog = AddBlockedDialog(self.app, self)
 
     def remove(self):
-        try:
-            selected = self.blockedList.selectedItems()
-            if selected:
-                item = selected[0]
-                index = self.blockedList.indexFromItem(item)
-                self.blockedList.takeItem(index.row())
-                user = item.text()
-                self.app.blocked.remove(user)
-                if user in self.app.friends.keys():
-                    treeitem = QStandardItem(user)
-                    treeitem.setText(user)
-                    treeitem.setIcon(QIcon(self.app.theme["path"] + "/offline.png"))
-                    self.app.gui.friendsModel.appendRow(treeitem)
-        except Exception as e:
-            print(e)
+        selected = self.blockedList.selectedItems()
+        if selected:
+            item = selected[0]
+            index = self.blockedList.indexFromItem(item)
+            self.blockedList.takeItem(index.row())
+            user = item.text()
+            self.app.blocked.remove(user)
+            if user in self.app.friends.keys():
+                treeitem = QStandardItem(user)
+                treeitem.setText(user)
+                treeitem.setIcon(QIcon(self.app.theme["path"] + "/offline.png"))
+                self.app.gui.friendsModel.appendRow(treeitem)
 
 class ConnectingDialog(QDialog):
     def __init__(self, app, parent):
@@ -481,6 +478,7 @@ class MemoMessageWidget(QWidget):
         self.app = app
         self.times = dict()
         self.time = 'i'
+        self.names = set()
         self.userLabel.setText(memo.join(["::", "::"]))
         self.sendButton.clicked.connect(self.send)
         self.userOutput.setReadOnly(True)
@@ -490,25 +488,50 @@ class MemoMessageWidget(QWidget):
         
     def send(self):
         '''Send the user the message in the userInput box, called on enter press / send button press'''
-        try:
-            msg = self.userInput.text()
-            if msg:
-                memo = self.memo
-                sendmsg = fmt_memo_msg(self.app, msg, self.app.nick)
-                disp = fmt_disp_memo(self.app, sendmsg, user=self.app.nick)
-                self.app.send_msg(sendmsg, user=memo)
-                self.userInput.setText("")
-                self.display_text(disp)
-        except Exception as e:
-            print(e)
+        msg = self.userInput.text()
+        if msg:
+            memo = self.memo
+            sendmsg = fmt_memo_msg(self.app, msg, self.app.nick)
+            disp = fmt_disp_memo(self.app, sendmsg, user=self.app.nick)
+            self.app.send_msg(sendmsg, user=memo)
+            self.userInput.setText("")
+            self.display_text(disp)
             
     def add_names(self, names):
-        self.names = names
-        names = list(names)
+        self.names = set(names)
+        names = list(set(self.names))
         for user in names:
-            itm = self.memoUsers.addItem(user)
-            if user.startswith("@"):
-                itm.setIcon(self.app.theme["path"] + "/op.png")
+            self.add_user_item(user)
+
+    def add_user_item(self, user):
+        if user.startswith("@"):
+            nam = user[1:]
+            self.memoUsers.addItem(nam)
+            itm = self.memoUsers.item(self.memoUsers.count()-1)
+            itm.setIcon(QIcon(self.app.theme["path"] + "/op.png"))
+        elif user.startswith("&"):
+            nam = user[1:]
+            self.memoUsers.addItem(nam)
+            itm = self.memoUsers.item(self.memoUsers.count()-1)
+            itm.setIcon(QIcon(self.app.theme["path"] + "/admin.png"))
+        elif user.startswith("%"):
+            nam = user[1:]
+            self.memoUsers.addItem(nam)
+            itm = self.memoUsers.item(self.memoUsers.count()-1)
+            itm.setIcon(QIcon(self.app.theme["path"] + "/halfop.png"))                
+        else:
+            nam = user
+            self.memoUsers.addItem(nam)
+            itm = self.memoUsers.item(self.memoUsers.count()-1)
+        color = self.app.getColor(nam)
+        if color.startswith("rgb"):
+            r,g,b = color.split(",")
+            r = int(r[-2:])
+            g = int(g)
+            b = int(b[:-1])
+        else:
+            r,g,b = rgb(color, type=tuple)
+        itm.setForeground(QColor(r,g,b))
 
     def display_text(self, msg):
         '''Insert msg into the display box'''
@@ -526,8 +549,8 @@ class MemoMessageWidget(QWidget):
         if user not in self.names:
             itm = self.memoUsers.addItem(user)
             self.send_time()
-            if user.startswith("@"):
-                itm.setIcon(self.app.theme["path"] + "/op.png")
+            self.add_user_item(user)
+            self.names.add(user)
 
         time = self.times[user] if user in self.times.keys() else "i"
         join_msg = fmt_memo_join(self.app, user, time, self.memo, opened=True)
@@ -562,7 +585,7 @@ class MemoTabWindow(QWidget):
         self.tabWidget.setTabsClosable(True)
         self.tabWidget.tabCloseRequested.connect(self.closeTab)
         self.setWindowTitle("Memos")
-        self.setWindowIcon(QIcon("resources/pc_chummy.png"))
+        self.setWindowIcon(QIcon(self.app.theme["path"] + "/memo.png"))
         self.app.gui.memoTabWindow = self
         self.show()
 

@@ -143,7 +143,7 @@ class App(QApplication):
             if mood.lower() != "offline":  
                 self.online.add(user)
             else:
-                app.online.remove(user)            
+                self.online.remove(user)            
             
             item = self.gui.getFriendItem(user)
             item.setIcon(QIcon(os.path.join(self.theme["path"], mood + ".png")))

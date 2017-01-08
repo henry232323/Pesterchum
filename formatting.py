@@ -157,11 +157,11 @@ def fmt_disp_memo(app, message, user, prefix=""):
 
 def fmt_memo_join(app, user, time, memo, part=False, opened=False):
     if part:
-        type = "responded to memo."
+        type = "ceased responding to memo."
     elif opened:
         type = "opened memo on board OOWOO."
     else:
-        type = "ceased responding to memo."
+        type = "responded to memo."
     if time[0] == "i":
         frame = "CURRENT"
         fmt = "<b>{clr} <span style=\"color:#646464\">RIGHT NOW {type}</span></b><br />"
