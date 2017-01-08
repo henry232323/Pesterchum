@@ -225,12 +225,40 @@ class App(QApplication):
         #Called when PM is closed or receive PESTERCHUM:CEASE
         pass
 
-    def memo_received(self, msg, memo):
+    def memo_received(self, msg, user, memo):
         if self.gui.memoTabWindow:
             tab = self.gui.memoTabWindow.getWidget(memo)
             if tab:
-                tab.display_text(msg)
-            
+                if user not in tab.times.keys():
+                    tab.display_text(fmt_memo_join(self.app,
+                                                    user,
+                                                    time,
+                                                    self.memo))
+                    time = "i"
+                else:
+                    time = tab.times[user]
+                time = "C" if time == "i" else time
+                wrap = fmt_color_wrap(time[0], self.getColor(user))
+                fin = "<b>{wrap}</b>{msg}".format(wrap=wrap, msg = msg)
+                tab.display_text(fin)
+
+    def memo_joined(self, user, memo):
+        if self.gui.memoTabWindow:
+            tab = self.gui.memoTabWindow.getWidget(memo)
+            if tab:
+                tab.user_join(user)
+
+    def memo_parted(self, user, memo):
+        if self.gui.memoTabWindow:
+            tab = self.gui.memoTabWindow.getWidget(memo)
+            if tab:
+                tab.user_part(user)
+
+    def memo_time(self, time, user, memo):
+        if self.gui.memoTabWindow:
+            tab = self.gui.memoTabWindow.getWidget(memo)
+            if tab:
+                tab.times[user] = time
             
     def add_friend(self, user):
         #Called when the ADD [CHUM] button is clicked and the dialog is answered

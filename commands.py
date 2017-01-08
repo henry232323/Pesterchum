@@ -1,3 +1,4 @@
+
 import re, os
 from datetime import datetime
 
@@ -20,9 +21,22 @@ class Commands:
         app.client.send(send)
 
     def join(app, user, channel, *args):
+        channel = channel.decode()
         user = user.decode() if type(user) == bytes else user
-        if user in app.friends.keys():
-            app.changeUserMood(user, 0)
+        if channel == "#pesterchum":
+            if user in app.friends.keys():
+                app.changeUserMood(user, 0)
+        else:
+            app.memo_joined(user, channel)
+
+    def part(app, user, channel, *args):
+        channel = channel.decode()
+        user = user.decode() if type(user) == bytes else user
+        if channel == "#pesterchum":
+            if user in app.friends.keys():
+                app.changeUserMood(user, 2)
+        else:
+            app.memo_parted(user, channel)
 
     def quit(app, user, channel, *args):
         user = user.decode() if type(user) == bytes else user
@@ -60,10 +74,12 @@ class Commands:
                     app.pm_received(fmt, user)
 
         else:
-            print(message, user)
+            if message.startswith("PESTERCHUM:TIME>"):
+                app.memo_time(message.split(">")[-1], user, channel)
+                return
             fmt = fmt_disp_memo(app, message, user)
             if fmt:
-                app.memo_received(fmt, channel)
+                app.memo_received(fmt, user, channel)
 
     def welcome(app, user, channel, *args):
         app.join()
