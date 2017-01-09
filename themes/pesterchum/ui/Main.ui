@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>231</width>
-    <height>414</height>
+    <height>412</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -21,25 +21,27 @@
     <property name="geometry">
      <rect>
       <x>0</x>
-      <y>0</y>
+      <y>90</y>
       <width>231</width>
-      <height>381</height>
+      <height>281</height>
      </rect>
     </property>
     <layout class="QVBoxLayout" name="verticalLayout">
-     <property name="margin">
+     <property name="spacing">
+      <number>3</number>
+     </property>
+     <property name="leftMargin">
       <number>12</number>
      </property>
-     <item>
-      <widget class="QLabel" name="appLabel">
-       <property name="text">
-        <string/>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignCenter</set>
-       </property>
-      </widget>
-     </item>
+     <property name="topMargin">
+      <number>12</number>
+     </property>
+     <property name="rightMargin">
+      <number>12</number>
+     </property>
+     <property name="bottomMargin">
+      <number>0</number>
+     </property>
      <item>
       <widget class="QLabel" name="label">
        <property name="text">
@@ -48,44 +50,7 @@
       </widget>
      </item>
      <item>
-      <widget class="QTreeWidget" name="chumsTree">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
-         <horstretch>0</horstretch>
-         <verstretch>4</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="maximumSize">
-        <size>
-         <width>16777215</width>
-         <height>16777215</height>
-        </size>
-       </property>
-       <property name="sizeIncrement">
-        <size>
-         <width>0</width>
-         <height>2</height>
-        </size>
-       </property>
-       <column>
-        <property name="text">
-         <string>Chums</string>
-        </property>
-        <property name="font">
-         <font>
-          <family>Courier</family>
-          <pointsize>11</pointsize>
-         </font>
-        </property>
-        <property name="background">
-         <color>
-          <red>0</red>
-          <green>0</green>
-          <blue>0</blue>
-         </color>
-        </property>
-       </column>
-      </widget>
+      <widget class="QTreeView" name="chumsTree"/>
      </item>
      <item>
       <layout class="QHBoxLayout" name="friendButtons">
@@ -118,7 +83,7 @@
      <item>
       <widget class="QLabel" name="handleLabel">
        <property name="text">
-        <string>CHUMHANDL</string>
+        <string>MYCHUMHANDLE:</string>
        </property>
       </widget>
      </item>
@@ -283,6 +248,19 @@
       </layout>
      </item>
     </layout>
+   </widget>
+   <widget class="QLabel" name="appLabel">
+    <property name="geometry">
+     <rect>
+      <x>50</x>
+      <y>460</y>
+      <width>46</width>
+      <height>13</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
    </widget>
   </widget>
   <widget class="QMenuBar" name="menubar">

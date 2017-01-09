@@ -1,6 +1,6 @@
 .Gui{
 	background-color: #FFB500;
-	border-image: url($path/pcbg.png);
+	background-image: url($path/pcbg.png);
 }
 .QLabel#appLabel{
 	color: white;
