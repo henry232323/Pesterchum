@@ -341,7 +341,7 @@ class OptionsWindow(QWidget):
         self.themesComboBox.setInsertPolicy(QComboBox.InsertAlphabetically)
         index = self.themesComboBox.findText(self.app.theme_name)
         self.themesComboBox.setCurrentIndex(index)
-        self.refreshThemeButton.clicked.connect(lambda: self.app.change_theme(self.app.theme_name))
+        self.refreshThemeButton.clicked.connect(lambda: self.app.refresh_theme())
 
         convo_opt = self.options["conversations"]
         chum_opt = self.options["chum_list"]
@@ -436,8 +436,25 @@ class MemosWindow(QWidget):
 
         self.show()
 
+    def join_button(self):
+        name = self.memoNameLineEdit.text()
+        if name:
+            if not self.app.gui.memoTabWindow:
+                self.app.gui.memoTabWindow = MemoTabWindow(self.app, self, name)
+                self.close()
+                return self.app.gui.memoTabWindow.init_memo
+            else:
+                self.close()
+                return self.app.gui.memoTabWindow.add_memo(channel)
+        else:
+            selected = self.memosTableWidget.selected()
+            if not selected:
+                return
+            else:
+                self.openMemo(selected[0])
+
     def openMemo(self, index):
-        channel = self.memosTableWidget.itemFromIndex(index).text()
+        channel = "#" + self.memosTableWidget.itemFromIndex(index).text()
         if not self.app.gui.memoTabWindow:
             self.app.gui.memoTabWindow = MemoTabWindow(self.app, self, channel)
             self.close()
@@ -449,7 +466,7 @@ class MemosWindow(QWidget):
     def add_channel(self, memo, usercount):
         self.memosTableWidget.insertRow(self.ctr)
         icn = QIcon(self.app.theme["path"] + "/memo.png")
-        mitem = QTableWidgetItem(icn,memo)
+        mitem = QTableWidgetItem(icn,memo[1:])
         mitem.setFlags(Qt.ItemFlags(Qt.ItemIsSelectable) | Qt.ItemFlags(Qt.ItemIsEnabled))
         uitem = QTableWidgetItem()
         uitem.setData(0,usercount)
@@ -478,13 +495,21 @@ class MemoMessageWidget(QWidget):
         self.times = dict()
         self.time = 'i'
         self.names = set()
+        
+        self.memoUsers.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.memoUsers.customContextMenuRequested.connect(self.openMemoMenu)
+        self.blockContext = QAction("BLOCK")
+        self.blockContext.triggered.connect(self.block_selected)
+        self.addFriendContext = QAction("ADD FRIEND")
+        self.addFriendContext.triggered.connect(self.add_selected_friend)
+        
         self.userLabel.setText(memo.join(["::", "::"]))
         self.sendButton.clicked.connect(self.send)
         self.userOutput.setReadOnly(True)
         self.userOutput.setMouseTracking(True)
         self.app.join(channel=memo)
         self.app.send_msg("PESTERCHUM:TIME>i", user=memo)
-        
+            
     def send(self):
         '''Send the user the message in the userInput box, called on enter press / send button press'''
         msg = self.userInput.text()
@@ -497,9 +522,8 @@ class MemoMessageWidget(QWidget):
             self.display_text(disp)
             
     def add_names(self, names):
-        self.names = set(names)
-        names = list(set(self.names))
-        for user in names:
+        self.names = names
+        for user in self.names:
             self.add_user_item(user)
 
     def add_user_item(self, user):
@@ -517,7 +541,12 @@ class MemoMessageWidget(QWidget):
             nam = user[1:]
             self.memoUsers.addItem(nam)
             itm = self.memoUsers.item(self.memoUsers.count()-1)
-            itm.setIcon(QIcon(self.app.theme["path"] + "/halfop.png"))                
+            itm.setIcon(QIcon(self.app.theme["path"] + "/halfop.png"))
+        elif user.startswith("~"):
+            nam = user[1:]
+            self.memoUsers.addItem(nam)
+            itm = self.memoUsers.item(self.memoUsers.count()-1)
+            itm.setIcon(QIcon(self.app.theme["path"] + "/founder.png")) 
         else:
             nam = user
             self.memoUsers.addItem(nam)
@@ -545,8 +574,7 @@ class MemoMessageWidget(QWidget):
             self.send()
 
     def user_join(self, user):
-        if user not in self.names:
-            itm = self.memoUsers.addItem(user)
+        if (user not in self.names) and (user != self.app.nick):
             self.send_time()
             self.add_user_item(user)
             self.names.add(user)
@@ -566,6 +594,27 @@ class MemoMessageWidget(QWidget):
 
     def send_time(self, time='i'):
         self.app.send_msg("PESTERCHUM:TIME>{}".format(time), user=self.memo)
+
+    def openMemoMenu(self, position):
+        if indexes:
+            menu = QMenu()
+            menu.addAction(self.addFriendContext)
+            menu.addAction(self.blockContext)
+            menu.exec_(self.chumsTree.viewport().mapToGlobal(position))
+
+    def block_selected(self):
+        selected = self.memoUsers.selected()
+        if selected:
+            user = selected[0].text()
+            if user not in self.app.blocked:
+                self.app.add_blocked(user)
+
+    def add_selected_friend(self):
+        selected = self.memoUsers.selected()
+        if selected:
+            user = selected[0].text()
+            if user not in self.app.friends.keys():
+                self.app.add_friend(user)
 
 class MemoTabWindow(QWidget):
     def __init__(self, app, parent, memo):

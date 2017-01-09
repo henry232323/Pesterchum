@@ -97,6 +97,15 @@ class App(QApplication):
                 self.gui = Gui(self.loop, self)
                 self.gui.initialize()
 
+    def refresh_theme(self):
+        getThemes()
+        self.theme = themes[theme]
+        self.theme_name = self.theme["name"]
+        self.setStyleSheet(self.theme["styles"])
+        self.gui.close()
+        self.gui = Gui(self.loop, self)
+        self.gui.initialize()
+
     def change_nick(self, nick, color):
         '''Change user nickname or \'Chumhandle\''''
         self.nick = nick
