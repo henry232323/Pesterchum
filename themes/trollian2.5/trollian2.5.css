@@ -176,7 +176,7 @@
 }
 .QTabBar::tab::selected{
 	border:0px;
-	background-color:#fdb302;
+	background-color:#f00000;
 	border-top:2px solid #FFA4A4;
 	border-left:2px solid #FFA4A4;
 	border-right:2px solid #FFA4A4;
@@ -219,14 +219,14 @@
 	font-family: Arial;font-weight: bold;
 }
 .SwitchDialog{
-	background-color: #fdb302;
+	background-color: #f00000;
 	font-family: Arial;font-weight: bold;
 }
 .QLabel#chamhanelLabel{
 	font-family: Arial;font-weight: bold;
 }
 .QLineEdit#getHandleInput{
-	background-color: #fdb302;
+	background-color: #f00000;
 	border: 1px solid black;
 	selection-background-color: gray;
 }
@@ -234,13 +234,13 @@
 	font-family: Arial;font-weight: bold;
 }
 .QComboBox{
-	background-color: #fdb302;
+	background-color: #f00000;
 	selection-background-color: gray;
 	font-family: Arial;font-weight: bold;
 }
 .QComboBox QAbstractItemView {
 	selection-background-color: gray;
-	background-color: #fdb302;
+	background-color: #f00000;
 	font-family: Arial;font-weight: bold;
 }
 .QPushButton#cancelButton, .QPushButton#proceedButton,
@@ -249,28 +249,28 @@
 .QPushButton#addBlockButton, .QPushButton#removeBlockButton,
 .QPushButton#closeUserlist, .QPushButton#connectingExitButton,
 .QPushButton#refreshThemeButton, .QPushButton#cancelMemoButton, .QPushButton#joinMemoButton {
-	background-color: #fdb302;
+	background-color: #f00000;
 	font-family: Arial;font-weight: bold;
 }
 .QCheckBox#defaultCheckBox{
-	background-color: #fdb302;
+	background-color: #f00000;
 	font-family: Arial;font-weight: bold;
 	selection-background-color: gray;
 }
 .ConfirmDeleteDialog{
-	background-color: #fdb302;
+	background-color: #f00000;
 	font-family: Arial;font-weight: bold;
 }
 .AddFriendDialog{
-	background-color: #fdb302;
+	background-color: #f00000;
 	font-family: Arial;font-weight: bold;
 }
 .AddBlockedDialog{
-	background-color: #fdb302;
+	background-color: #f00000;
 	font-family: Arial;font-weight: bold;
 }
 .BlockedDialog{
-	background-color: #fdb302;
+	background-color: #f00000;
 	font-family: Arial;font-weight: bold;
 }
 .QListWidget#blockedList, .QListWidget#userList{
@@ -287,39 +287,39 @@
 	background-color: rgb(200,200,200,50);
 }
 .QLineEdit#addChumInput{
-	background-color: #fdb302;
+	background-color: #f00000;
 	border: 1px solid black;
 	selection-background-color: gray;
 }
 .InvalidUserDialog{
-	background-color: #fdb302;
+	background-color: #f00000;
 	font-family: Arial;font-weight: bold;
 }
 .ConnectingDialog{
-	background-color: #fdb302;
+	background-color: #f00000;
 	font-family: Arial;font-weight: bold;
 }
 .UserlistWindow{
-	background-color: #fdb302;
+	background-color: #f00000;
 	font-family: Arial;font-weight: bold;
 }
 .OptionsWindow{
-	background-color: #fdb302;
+	background-color: #f00000;
 	font-family: Arial;font-weight: bold;
 }
 .OptionsWindow .QPushButton[checkable="true"]{
-	background-color: #fdb302;
+	background-color: #f00000;
 	font-family: Arial;font-weight: bold;
 }
 .OptionsWindow .QPushButton[checkable="true"]::selected{
 	font-family: Arial;font-weight: bold;
 }
 .MemosWindow{
-	background-color: #fdb302;
+	background-color: #f00000;
 	font-family: Arial;font-weight: bold;
 }
 .QLineEdit#timeframeDisplayLine, .QLineEdit#memoNameLineEdit{
-	background-color: #fdb302;
+	background-color: #f00000;
 	border: 1px solid black;
 	selection-background-color: gray;	
 }
