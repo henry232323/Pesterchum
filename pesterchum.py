@@ -88,14 +88,17 @@ class App(QApplication):
         asyncio.ensure_future(run_exe())
 
     def change_theme(self, theme):
-        if theme != self.theme_name:
-            self.theme = themes[theme]
-            self.theme_name = self.theme["name"]
-            self.setStyleSheet(self.theme["styles"])
-            if hasattr(self, "gui"):
-                self.gui.close()
-                self.gui = Gui(self.loop, self)
-                self.gui.initialize()
+        try:
+            if theme != self.theme_name:
+                self.theme = themes[theme]
+                self.theme_name = self.theme["name"]
+                self.setStyleSheet(self.theme["styles"])
+                if hasattr(self, "gui"):
+                    self.gui.close()
+                    self.gui = Gui(self.loop, self)
+                    self.gui.initialize()
+        except Exception as e:
+            print(e)
 
     def refresh_theme(self):
         getThemes()
@@ -234,15 +237,16 @@ class App(QApplication):
         pass
 
     def memo_received(self, msg, user, memo):
+        print(msg, user, memo)
         if self.gui.memoTabWindow:
             tab = self.gui.memoTabWindow.getWidget(memo)
             if tab:
                 if user not in tab.times.keys():
+                    time = "i"
                     tab.display_text(fmt_memo_join(self.app,
                                                     user,
                                                     time,
                                                     self.memo))
-                    time = "i"
                 else:
                     time = tab.times[user]
                 time = "C" if time == "i" else time
@@ -263,6 +267,7 @@ class App(QApplication):
                 tab.user_part(user)
 
     def memo_time(self, time, user, memo):
+        print(time, user, memo)
         if self.gui.memoTabWindow:
             tab = self.gui.memoTabWindow.getWidget(memo)
             if tab:
@@ -396,3 +401,4 @@ class App(QApplication):
         sys.exit()
 
 PesterClient = App()
+
