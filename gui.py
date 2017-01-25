@@ -88,9 +88,9 @@ class Gui(QMainWindow):
         
         self.show()
 
-    def closeEvent(self, event):
-        event.accept()
-        self.app.exit()
+    #def closeEvent(self, event):
+    #    event.accept()
+    #    self.app.exit()
 
     def openSwitchDialog(self):
         self.switchDialog = SwitchDialog(self.app, self)
@@ -113,7 +113,7 @@ class Gui(QMainWindow):
         self.userList = UserlistWindow(self.app, self)
 
     def openOptions(self):
-        self.userList = OptionsWindow(self.app, self)
+        self.optionsWindow = OptionsWindow(self.app, self)
 
     def openMemosWindow(self):
         self.memosWindow = MemosWindow(self.app, self)
