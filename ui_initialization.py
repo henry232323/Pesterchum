@@ -54,6 +54,14 @@ def initialize_menu(self):
     self.openPicker.triggered.connect(self.color_picker)
     self.profileMenu.addAction(self.openPicker)
 
+    self.quirkAction = QAction("QUIRKS", self)
+
+
+    # Create QUIRKS button in 'PROFILE' menu
+    self.quirkAction = QAction("QUIRKS", self)
+    self.quirkAction.triggered.connect(self.openQuirkWindow)
+    self.profileMenu.addAction(self.quirkAction)
+
     #Create SWITCH button in 'PROFILE' menu
     self.openSwitch = QAction("SWITCH", self)
     self.openSwitch.triggered.connect(self.openSwitchDialog)

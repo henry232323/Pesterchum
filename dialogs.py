@@ -9,6 +9,7 @@ from themes import *
 from messages import *
 from formatting import fmt_memo_msg, rgb
 
+
 class PrivateMessageWidget(QWidget):
     def __init__(self, app, container, parent, user):
         '''
@@ -25,11 +26,12 @@ class PrivateMessageWidget(QWidget):
         self.userOutput.setReadOnly(True)
         self.userOutput.setMouseTracking(True)
         self.display_text(fmt_begin_msg(app, self.app.nick, user))
-        
+
     def send(self):
         '''Send the user the message in the userInput box, called on enter press / send button press'''
         msg = self.userInput.text()
         if msg:
+            msg = self.app.quirks.process_quirks(msg)
             user = self.user
             self.app.send_msg(msg, user=user)
             self.userInput.setText("")
@@ -48,6 +50,7 @@ class PrivateMessageWidget(QWidget):
         if event.key() == Qt.Key_Return:
             self.send()
 
+
 class TabWindow(QWidget):
     def __init__(self, app, parent, user):
         '''
@@ -55,12 +58,12 @@ class TabWindow(QWidget):
         between current private message users
         '''
         super(__class__, self).__init__()
-        self.parent=parent
+        self.parent = parent
         self.app = app
         uic.loadUi(app.theme["ui_path"] + "/TabWindow.ui", self)
         self.users = []
         self.init_user = self.add_user(user)
-        self.tabWidget.removeTab(0)#Remove two default tabs
+        self.tabWidget.removeTab(0)  # Remove two default tabs
         self.tabWidget.removeTab(0)
         self.tabWidget.setTabsClosable(True)
         self.tabWidget.tabCloseRequested.connect(self.closeTab)
@@ -85,7 +88,7 @@ class TabWindow(QWidget):
                 self.app.send_cease(user)
         event.accept()
         self.app.gui.tabWindow = None
-        
+
     def add_user(self, user):
         '''
         Add a user & PrivateMessageWidget to window, check if it is already there
@@ -103,6 +106,7 @@ class TabWindow(QWidget):
             return tab
         else:
             return self.tabWidget.widget(self.users.index(user))
+
 
 class SwitchDialog(QDialog):
     def __init__(self, app, parent):
@@ -155,6 +159,7 @@ class SwitchDialog(QDialog):
                 del self.app.users[selected_name]
                 self.profilesDropdown.removeItem(self.profilesDropdown.currentIndex())
 
+
 class ConfirmDeleteDialog(QDialog):
     def __init__(self, app, parent, user):
         '''
@@ -179,6 +184,7 @@ class ConfirmDeleteDialog(QDialog):
         self.accepted = False
         self.close()
 
+
 class AddFriendDialog(QDialog):
     def __init__(self, app, parent):
         '''
@@ -193,7 +199,7 @@ class AddFriendDialog(QDialog):
         self.acceptButton.clicked.connect(self.accepted)
         self.rejectButton.clicked.connect(self.close)
         self.exec_()
-        
+
     def accepted(self):
         '''Call once accepted, check if name is alphanumeric if not warn and try again'''
         user = self.addChumInput.text()
@@ -202,7 +208,8 @@ class AddFriendDialog(QDialog):
             self.close()
         else:
             self.err = InvalidUserDialog(self.app, self, user)
-                
+
+
 class AddBlockedDialog(QDialog):
     def __init__(self, app, parent):
         '''
@@ -233,6 +240,7 @@ class AddBlockedDialog(QDialog):
         else:
             self.close()
 
+
 class InvalidUserDialog(QDialog):
     def __init__(self, app, parent, user):
         '''
@@ -245,10 +253,11 @@ class InvalidUserDialog(QDialog):
         self.setWindowTitle('Invalid Name')
         self.setWindowIcon(QIcon("resources/pc_chummy.png"))
         fmt = "Name <span style='font_weight: bold;'>{}</style> is not valid! Make sure it is alphanumeric"
-        self.errUserLabel.setText(fmt.format(user))                                  
+        self.errUserLabel.setText(fmt.format(user))
         self.acceptButton.clicked.connect(self.close)
         self.exec_()
-        
+
+
 class BlockedDialog(QDialog):
     def __init__(self, app, parent):
         super(__class__, self).__init__()
@@ -280,6 +289,7 @@ class BlockedDialog(QDialog):
                 treeitem.setIcon(QIcon(self.app.theme["path"] + "/offline.png"))
                 self.app.gui.friendsModel.appendRow(treeitem)
 
+
 class ConnectingDialog(QDialog):
     def __init__(self, app, parent):
         super(__class__, self).__init__()
@@ -296,6 +306,7 @@ class ConnectingDialog(QDialog):
         self.setFixedSize(width, height)
 
         self.exec_()
+
 
 class UserlistWindow(QWidget):
     def __init__(self, app, parent):
@@ -314,13 +325,14 @@ class UserlistWindow(QWidget):
         self.userList.setSortingEnabled(True)
         self.userList.addItems(self.app.names_list["#pesterchum"])
         self.userList.itemDoubleClicked.connect(self.app.gui.open_privmsg_userlist)
-    
+
         self.show()
+
 
 class OptionsWindow(QWidget):
     def __init__(self, app, parent):
         super(__class__, self).__init__()
-        uic.loadUi(app.theme["ui_path"] + "/OptionsWindow.ui", self)    
+        uic.loadUi(app.theme["ui_path"] + "/OptionsWindow.ui", self)
         self.app = app
         self.parent = parent
         self.setWindowTitle('Options')
@@ -329,12 +341,12 @@ class OptionsWindow(QWidget):
         width = self.frameGeometry().width()
         height = self.frameGeometry().height()
         self.setFixedSize(width, height)
-        self.buttons = (self.optionsButton1,self.optionsButton2,self.optionsButton3,self.optionsButton4,
-                        self.optionsButton5,self.optionsButton6,self.optionsButton7,self.optionsButton8)
+        self.buttons = (self.optionsButton1, self.optionsButton2, self.optionsButton3, self.optionsButton4,
+                        self.optionsButton5, self.optionsButton6, self.optionsButton7, self.optionsButton8)
 
         for index, button in enumerate(self.buttons):
             button.clicked.connect(self.make_call(index, button))
-            
+
         self.acceptButton.clicked.connect(self.saveConfig)
         self.rejectButton.clicked.connect(self.close)
         self.themesComboBox.addItems(self.app.themes.keys())
@@ -346,51 +358,51 @@ class OptionsWindow(QWidget):
         convo_opt = self.options["conversations"]
         chum_opt = self.options["chum_list"]
         interface_opt = self.options["interface"]
-        
-        #Chum List
+
+        # Chum List
         self.hideOfflineRadio.setChecked(chum_opt["hide_offline_chums"])
         self.showEmptyRadio.setChecked(chum_opt["show_empty_groups"])
         self.showNumberRadio.setChecked(chum_opt["show_number_of_online_chums"])
         self.sortChumsCombo.addItems(("Alphabetically", "Mood"))
         self.sortChumsCombo.setCurrentIndex(chum_opt["sort_chums"])
         self.lowBandwidthRadio.setChecked(chum_opt["low_bandwidth"])
-        #Conversations
+        # Conversations
         self.timeStampsRadio.setChecked(convo_opt["time_stamps"])
         self.showSecondsRadio.setChecked(convo_opt["show_seconds"])
         self.opVoiceMemoRadio.setChecked(convo_opt["op_and_voice_in_memos"])
         self.animatedSmiliesRadio.setChecked(convo_opt["use_animated_smilies"])
         self.randomEncountersRadio.setChecked(convo_opt["receive_random_encounters"])
-        self.clockTypeComboBox.addItems(('12','24'))
+        self.clockTypeComboBox.addItems(('12', '24'))
         self.clockTypeComboBox.setCurrentIndex(convo_opt["clock_type"])
-        #Interface
+        # Interface
         self.tabbedConvoBox.setChecked(interface_opt["tabbed_conversations"])
         self.tabbedMemoBox.setChecked(interface_opt["tabbed_memos"])
         self.blinkPesterBox.setChecked(interface_opt["blink_taskbar_on_pesters"])
         self.blinkMemoBox.setChecked(interface_opt["blink_taskbar_on_memos"])
-        self.minimizeCombo.addItems(('Minimize to Taskbar','Minimize to Tray', 'Quit'))
+        self.minimizeCombo.addItems(('Minimize to Taskbar', 'Minimize to Tray', 'Quit'))
         self.minimizeCombo.setCurrentIndex(interface_opt["minimize"])
-        self.closeCombo.addItems(('Minimize to Taskbar','Minimize to Tray', 'Quit'))
+        self.closeCombo.addItems(('Minimize to Taskbar', 'Minimize to Tray', 'Quit'))
         self.closeCombo.setCurrentIndex(interface_opt["close"])
-    
+
         self.show()
-        
+
     def saveConfig(self):
         oldtheme = self.app.theme_name
         try:
-            #Chum List
+            # Chum List
             self.options["chum_list"]["hide_offline_chums"] = self.hideOfflineRadio.isChecked()
             self.options["chum_list"]["show_empty_groups"] = self.showEmptyRadio.isChecked()
             self.options["chum_list"]["show_number_of_online_chums"] = self.showNumberRadio.isChecked()
             self.options["chum_list"]["sort_chums"] = self.sortChumsCombo.currentIndex()
             self.options["chum_list"]["low_bandwidth"] = self.lowBandwidthRadio.isChecked()
-            #Conversations
+            # Conversations
             self.options["conversations"]["time_stamps"] = self.timeStampsRadio.isChecked()
             self.options["conversations"]["show_seconds"] = self.showSecondsRadio.isChecked()
             self.options["conversations"]["op_and_voice_in_memos"] = self.opVoiceMemoRadio.isChecked()
             self.options["conversations"]["use_animated_smilies"] = self.animatedSmiliesRadio.isChecked()
             self.options["conversations"]["receive_random_encounters"] = self.randomEncountersRadio.isChecked()
             self.options["conversations"]["clock_type"] = self.clockTypeComboBox.currentIndex()
-            #Interface
+            # Interface
             self.options["interface"]["tabbed_conversations"] = self.tabbedConvoBox.isChecked()
             self.options["interface"]["tabbed_memos"] = self.tabbedMemoBox.isChecked()
             self.options["interface"]["blink_taskbar_on_pesters"] = self.blinkPesterBox.isChecked()
@@ -412,13 +424,14 @@ class OptionsWindow(QWidget):
             for Button in self.buttons:
                 if button != Button:
                     Button.setChecked(False)
-                
+
         return setIndex
+
 
 class MemosWindow(QWidget):
     def __init__(self, app, parent):
         super(__class__, self).__init__()
-        uic.loadUi(app.theme["ui_path"] + "/MemoWindow.ui", self)    
+        uic.loadUi(app.theme["ui_path"] + "/MemoWindow.ui", self)
         self.app = app
         self.parent = parent
         self.setWindowTitle('Memos')
@@ -445,7 +458,7 @@ class MemosWindow(QWidget):
                 return self.app.gui.memoTabWindow.init_memo
             else:
                 self.close()
-                return self.app.gui.memoTabWindow.add_memo(channel)
+                return self.app.gui.memoTabWindow.add_memo(name)
         else:
             selected = self.memosTableWidget.selected()
             if not selected:
@@ -466,19 +479,20 @@ class MemosWindow(QWidget):
     def add_channel(self, memo, usercount):
         self.memosTableWidget.insertRow(self.ctr)
         icn = QIcon(self.app.theme["path"] + "/memo.png")
-        mitem = QTableWidgetItem(icn,memo[1:])
+        mitem = QTableWidgetItem(icn, memo[1:])
         mitem.setFlags(Qt.ItemFlags(Qt.ItemIsSelectable) | Qt.ItemFlags(Qt.ItemIsEnabled))
         uitem = QTableWidgetItem()
-        uitem.setData(0,usercount)
+        uitem.setData(0, usercount)
         uitem.setTextAlignment(2)
         uitem.setFlags(Qt.ItemFlags(Qt.ItemIsSelectable) | Qt.ItemFlags(Qt.ItemIsEnabled))
-        self.memosTableWidget.setItem(self.ctr,0,mitem)
-        self.memosTableWidget.setItem(self.ctr,1,uitem)
+        self.memosTableWidget.setItem(self.ctr, 0, mitem)
+        self.memosTableWidget.setItem(self.ctr, 1, uitem)
         self.ctr += 1
 
     def closeEvent(self, event):
         event.accept()
         self.app.gui.memosWindow = None
+
 
 class MemoMessageWidget(QWidget):
     def __init__(self, app, container, parent, memo):
@@ -495,32 +509,33 @@ class MemoMessageWidget(QWidget):
         self.times = dict()
         self.time = 'i'
         self.names = set()
-        
+
         self.memoUsers.setContextMenuPolicy(Qt.CustomContextMenu)
         self.memoUsers.customContextMenuRequested.connect(self.openMemoMenu)
         self.blockContext = QAction("BLOCK")
         self.blockContext.triggered.connect(self.block_selected)
         self.addFriendContext = QAction("ADD FRIEND")
         self.addFriendContext.triggered.connect(self.add_selected_friend)
-        
+
         self.userLabel.setText(memo.join(["::", "::"]))
         self.sendButton.clicked.connect(self.send)
         self.userOutput.setReadOnly(True)
         self.userOutput.setMouseTracking(True)
         self.app.join(channel=memo)
         self.app.send_msg("PESTERCHUM:TIME>i", user=memo)
-            
+
     def send(self):
         '''Send the user the message in the userInput box, called on enter press / send button press'''
         msg = self.userInput.text()
         if msg:
             memo = self.memo
+            msg = self.app.quirks.process_quirks(msg)
             sendmsg = fmt_memo_msg(self.app, msg, self.app.nick)
             disp = fmt_disp_memo(self.app, sendmsg, user=self.app.nick)
             self.app.send_msg(sendmsg, user=memo)
             self.userInput.setText("")
             self.display_text(disp)
-            
+
     def add_names(self, names):
         self.names = names
         for user in self.names:
@@ -530,36 +545,36 @@ class MemoMessageWidget(QWidget):
         if user.startswith("@"):
             nam = user[1:]
             self.memoUsers.addItem(nam)
-            itm = self.memoUsers.item(self.memoUsers.count()-1)
+            itm = self.memoUsers.item(self.memoUsers.count() - 1)
             itm.setIcon(QIcon(self.app.theme["path"] + "/op.png"))
         elif user.startswith("&"):
             nam = user[1:]
             self.memoUsers.addItem(nam)
-            itm = self.memoUsers.item(self.memoUsers.count()-1)
+            itm = self.memoUsers.item(self.memoUsers.count() - 1)
             itm.setIcon(QIcon(self.app.theme["path"] + "/admin.png"))
         elif user.startswith("%"):
             nam = user[1:]
             self.memoUsers.addItem(nam)
-            itm = self.memoUsers.item(self.memoUsers.count()-1)
+            itm = self.memoUsers.item(self.memoUsers.count() - 1)
             itm.setIcon(QIcon(self.app.theme["path"] + "/halfop.png"))
         elif user.startswith("~"):
             nam = user[1:]
             self.memoUsers.addItem(nam)
-            itm = self.memoUsers.item(self.memoUsers.count()-1)
-            itm.setIcon(QIcon(self.app.theme["path"] + "/founder.png")) 
+            itm = self.memoUsers.item(self.memoUsers.count() - 1)
+            itm.setIcon(QIcon(self.app.theme["path"] + "/founder.png"))
         else:
             nam = user
             self.memoUsers.addItem(nam)
-            itm = self.memoUsers.item(self.memoUsers.count()-1)
+            itm = self.memoUsers.item(self.memoUsers.count() - 1)
         color = self.app.getColor(nam)
         if color.startswith("rgb"):
-            r,g,b = color.split(",")
+            r, g, b = color.split(",")
             r = int(r[-2:])
             g = int(g)
             b = int(b[:-1])
         else:
-            r,g,b = rgb(color, type=tuple)
-        itm.setForeground(QColor(r,g,b))
+            r, g, b = rgb(color, type=tuple)
+        itm.setForeground(QColor(r, g, b))
 
     def display_text(self, msg):
         '''Insert msg into the display box'''
@@ -587,7 +602,7 @@ class MemoMessageWidget(QWidget):
         item = self.memoUsers.findItems(user, Qt.MatchFlags(Qt.MatchExactly))
         row = self.memoUsers.row(item[0])
         self.memoUsers.takeItem(row)
-        
+
         time = self.times[user] if user in self.times.keys() else "i"
         part_msg = fmt_memo_join(self.app, user, time, self.memo, part=True)
         self.display_text(part_msg)
@@ -596,11 +611,10 @@ class MemoMessageWidget(QWidget):
         self.app.send_msg("PESTERCHUM:TIME>{}".format(time), user=self.memo)
 
     def openMemoMenu(self, position):
-        if indexes:
-            menu = QMenu()
-            menu.addAction(self.addFriendContext)
-            menu.addAction(self.blockContext)
-            menu.exec_(self.chumsTree.viewport().mapToGlobal(position))
+        menu = QMenu()
+        menu.addAction(self.addFriendContext)
+        menu.addAction(self.blockContext)
+        menu.exec_(self.chumsTree.viewport().mapToGlobal(position))
 
     def block_selected(self):
         selected = self.memoUsers.selected()
@@ -616,6 +630,7 @@ class MemoMessageWidget(QWidget):
             if user not in self.app.friends.keys():
                 self.app.add_friend(user)
 
+
 class MemoTabWindow(QWidget):
     def __init__(self, app, parent, memo):
         '''
@@ -623,12 +638,12 @@ class MemoTabWindow(QWidget):
         between current private message users
         '''
         super(__class__, self).__init__()
-        self.parent=parent
+        self.parent = parent
         self.app = app
         uic.loadUi(app.theme["ui_path"] + "/MemoTabWindow.ui", self)
         self.memos = []
         self.init_memo = self.add_memo(memo)
-        self.tabWidget.removeTab(0)#Remove two default tabs
+        self.tabWidget.removeTab(0)  # Remove two default tabs
         self.tabWidget.removeTab(0)
         self.tabWidget.setTabsClosable(True)
         self.tabWidget.tabCloseRequested.connect(self.closeTab)
@@ -663,7 +678,7 @@ class MemoTabWindow(QWidget):
             return self.tabWidget.widget(self.memos.index(memo))
         else:
             return None
-            
+
     def add_memo(self, memo):
         '''
         Add a user & PrivateMessageWidget to window, check if it is already there
@@ -679,3 +694,168 @@ class MemoTabWindow(QWidget):
             return tab
         else:
             return self.getWidget(memo)
+
+class QuirksWindow(QWidget):
+    def __init__(self, app):
+        super(__class__, self).__init__()
+        self.app = app
+        uic.loadUi(self.app.theme["ui_path"] + "/QuirksWindow.ui", self)
+        self.addQuirkButton.clicked.connect(self.openQuirk)
+        self.editQuirkButton.clicked.connect(self.editQuirk)
+        self.removeQuirkButton.clicked.connect(self.removeQuirk)
+        self.cancelButton.clicked.connect(self.closeWin)
+        self.okButton.clicked.connect(self.save)
+        self.testButton.clicked.connect(self.testQuirks)
+        for type, quirk in self.app.quirks.quirks:
+            self.quirksList.addItem("{}:{}".format(type, quirk))
+
+        self.setWindowTitle('Quirks')
+        self.setWindowIcon(QIcon(app.theme["path"] + "/trayicon.png"))
+
+        self.show()
+
+    def openQuirk(self):
+        AddQuirkWindow(self.app, self)
+
+    def editQuirk(self):
+        pass
+
+    def removeQuirk(self):
+        items = self.quirksList.selectedItems()
+        for item in items:
+            row = self.quirksList.indexFromItem(item).row()
+            self.app.quirks.quirks.pop(row)
+            self.quirksList.takeItem(row)
+
+    def closeWin(self):
+        self.close()
+
+    def save(self):
+        self.close()
+
+    def testQuirks(self):
+        pass
+
+
+class AddQuirkWindow(QWidget):
+    def __init__(self, app, parent):
+        super(__class__, self).__init__()
+        self.app = app
+        self.parent = parent
+        uic.loadUi(self.app.theme["ui_path"] + "/AddQuirkWindow.ui", self)
+
+        self.buttons = ('opts', 'prefix', 'suffix', 'replace', 'regex', 'random')
+        self.setWindowTitle('Quirks')
+        self.setWindowIcon(QIcon(app.theme["path"] + "/trayicon.png"))
+
+        enableNext = lambda: self.nextButton.setEnabled(True)
+        self.nextButton.setEnabled(False)
+        self.prefixRadio.clicked.connect(enableNext)
+        self.suffixRadio.clicked.connect(enableNext)
+        self.replaceRadio.clicked.connect(enableNext)
+        self.regexRadio.clicked.connect(enableNext)
+        self.randomRadio.clicked.connect(enableNext)
+
+        self.nextButton.clicked.connect(self.next)
+        self.nextButton_2.clicked.connect(self.next)
+        self.nextButton_3.clicked.connect(self.next)
+        self.nextButton_4.clicked.connect(self.next)
+        self.nextButton_5.clicked.connect(self.next)
+        self.nextButton_6.clicked.connect(self.next)
+
+        self.backButton.clicked.connect(self.back)
+        self.backButton_2.clicked.connect(self.back)
+        self.backButton_3.clicked.connect(self.back)
+        self.backButton_4.clicked.connect(self.back)
+        self.backButton_5.clicked.connect(self.back)
+        self.backButton_6.clicked.connect(self.back)
+
+        self.cancelButton.clicked.connect(self.close)
+        self.cancelButton_2.clicked.connect(self.close)
+        self.cancelButton_3.clicked.connect(self.close)
+        self.cancelButton_4.clicked.connect(self.close)
+        self.cancelButton_5.clicked.connect(self.close)
+        self.cancelButton_6.clicked.connect(self.close)
+
+        self.addRandomButton.clicked.connect(self.addRandom)
+        self.removeRandomButton.clicked.connect(self.removeRandom)
+        self.reloadFuncs.clicked.connect(self.reload_functions)
+        self.randReloadFuncs.clicked.connect(self.rand_reload_functions)
+
+        self.randomRegex = list()
+
+        self.show()
+
+    def back(self):
+        self.stackWidget.setCurrentIndex(0)
+
+    def next(self):
+        index = self.stackWidget.currentIndex()
+        if index == 0:
+            if self.prefixRadio.isChecked():
+                self.stackWidget.setCurrentIndex(1)
+            elif self.suffixRadio.isChecked():
+                self.stackWidget.setCurrentIndex(2)
+            elif self.replaceRadio.isChecked():
+                self.stackWidget.setCurrentIndex(3)
+            elif self.regexRadio.isChecked():
+                self.stackWidget.setCurrentIndex(4)
+                self.addFuncs()
+            elif self.randomRadio.isChecked():
+                self.stackWidget.setCurrentIndex(5)
+                self.randAddFuncs()
+        elif index == 1:
+            value = self.prefixLineEdit.text()
+            self.app.quirks.append(("prefix", value,))
+        elif index == 2:
+            value = self.suffixLineEdit.text()
+            self.app.quirks.append(("suffix", value,))
+        elif index == 3:
+            value = (self.replaceReplaceLineEdit.text(), self.replaceWithLineEdit.text())
+            self.app.quirks.append(("replace", value,))
+        elif index == 4:
+            replace = self.regexpReplaceLineEdit.text()
+            fm = self.regexpLineEdit.text()
+            if not ("(" in fm and ")" in fm):
+                fm = "({})".format(fm)
+            value = (fm, replace)
+            self.app.quirks.append(("regex", value,))
+        elif index == 5:
+            fm = self.randomRegexpLineEdit.text()
+            if not ("(" in fm and ")" in fm):
+                fm = "({})".format(fm)
+            value = (fm, tuple(self.randomRegex))
+            self.app.quirks.append(("random", value,))
+        if index != 0:
+            self.parent.quirksList.addItem("{}:{}".format(self.buttons[index], value))
+            self.close()
+
+    def addRandom(self):
+        nq = self.addRandomLineEdit.text()
+        self.randomList.addItem(nq)
+        self.randomRegex.append(nq)
+        self.addRandomLineEdit.setText("")
+
+    def removeRandom(self):
+        items = self.randomList.selectedItems()
+        for item in items:
+            self.randomRegex.remove(item.text())
+            self.randomList.takeItem(self.randomList.indexFromItem(item).row())
+
+    def randAddFuncs(self):
+        for func in self.app.quirks.qfuncs.values():
+            self.randRegexFuncs.addItem(func.__name__ + "()")
+
+    def addFuncs(self):
+        for func in self.app.quirks.qfuncs.values():
+            self.regexFuncs.addItem(func.__name__ + "()")
+
+    def reload_functions(self):
+        self.regexFuncs.reset()
+        self.app.quirks.reload()
+        self.addFuncs()
+
+    def rand_reload_functions(self):
+        self.randRegexFuncs.reset()
+        self.app.quirks.reload()
+        self.addFuncs()

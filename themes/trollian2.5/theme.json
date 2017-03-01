@@ -1,0 +1,6 @@
+{
+  "name": "Trollian 2.5",
+  "ui_path": "ui",
+  "inherits": null,
+  "css": "trollian2.5.css"
+}
