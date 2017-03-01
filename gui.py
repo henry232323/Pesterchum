@@ -34,10 +34,6 @@ class Gui(QMainWindow):
         width = self.frameGeometry().width()
         height = self.frameGeometry().height()
         self.setFixedSize(width, height)
-
-        #Make window movable from 'Pesterchum' label, for lack of Title Bar
-        self.appLabel.mousePressEvent = self.label_mousePressEvent
-        self.appLabel.mouseMoveEvent = self.label_mouseMoveEvent
         
         #Set window info
         self.setWindowTitle('Pesterchum')
@@ -155,6 +151,9 @@ class Gui(QMainWindow):
         self.tabWindow.raise_()
         self.tabWindow.activateWindow()
 
+    def openQuirkWindow(self):
+        self.openQuirkWindow = QuirksWindow(self.app)
+
     @pyqtSlot(QListWidgetItem)
     def open_privmsg_userlist(self, item):
         user = item.text()
@@ -210,11 +209,11 @@ class Gui(QMainWindow):
 
     #Methods for moving window
     @pyqtSlot()
-    def label_mousePressEvent(self, event):
+    def mousePressEvent(self, event):
         self.offset = event.pos()
 
     @pyqtSlot()
-    def label_mouseMoveEvent(self, event):
+    def mouseMoveEvent(self, event):
         x=event.globalX()
         y=event.globalY()
         x_w = self.offset.x()
@@ -232,8 +231,7 @@ class Gui(QMainWindow):
                 if name not in self.app.online:
                     index = self.friendsModel.indexFromItem(item)
                     self.chumsTree.setRowHidden(index.row(),self.friendsModel.parent(index), False)
-            
-    
+
     class FriendsModel(QStandardItemModel):
         def __init__(self, app, parent=None):
             QStandardItemModel.__init__(self, parent)

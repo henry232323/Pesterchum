@@ -13,6 +13,7 @@ from moods import *
 from config import Config, save_config
 from options import Options, save_options
 from commands import Commands
+from quirks import Quirks
 import exceptions
 
 from oyoyo import cmdhandler, parse
@@ -54,6 +55,7 @@ class App(QApplication):
         self.username = "pcc31"
         self.realname = "pcc31"
         self.nick = self.config['defaultuser']
+        self.quirks = Quirks(self)
         self.users = self.config['users']
         self.color = self.users[self.nick] if self.nick in self.users.keys() else "#000"
         self.lowBandwidth = self.options["chum_list"]["low_bandwidth"]
@@ -396,6 +398,7 @@ class App(QApplication):
         self.config['lastTheme'] = self.theme_name
         save_config(self.config)
         save_options(self.options)
+        self.quirks.save_quirks()
         msg = "QUIT :Disconnected"
         self.client.send(msg)
         sys.exit()
