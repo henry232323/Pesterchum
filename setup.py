@@ -24,7 +24,7 @@ if sys.platform == "win32":
 
 setup(
     name = "Pesterchum-3.5",
-    version = "3.5-0.1.0",
+    version = "3.5-0.2.0",
     description = "A version of ghostDunk/illuminatedWax's Pesterchum client, built using Asyncio, PyQt5, and Python 3.5. A server specific IRC client built to imitate the Pesterchum chat client as seen in Homestuck.",
     options = {"build_exe": build_exe_options},
     executables = [Executable("pesterchum.py", base=base, icon="resources/pc_chummy.ico")]
