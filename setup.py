@@ -2,18 +2,20 @@ import sys
 from cx_Freeze import setup, Executable
 import os
 
-os.environ['TCL_LIBRARY'] = "C:\\Users\\Henry\\AppData\\Local\\Programs\\Python\\Python35-32\\tcl\\tcl8.6"
-os.environ['TK_LIBRARY'] = "C:\\Users\\Henry\\AppData\\Local\\Programs\\Python\\Python35-32\\tcl\\tk8.6"
-
 sys.argv.append("build")
 
 include_files = ["resources", "themes", "cfg"]
 
 build_exe_options = {
-    "includes":["PyQt5", "os", "json", "asyncio", "types"],
-    "excludes":["tkinter", "_tkinter", '_gtkagg', '_tkagg', 'bsddb', 'curses',
-            'email', 'pywin.debugger',
-            'pywin.debugger.dbgcon', 'pywin.dialogs', 'tcl'],
+    "includes": ["PyQt5", "os", "json", "types", "discord", "aiohttp",
+                 "requests", "contextlib", "io", "inspect", "traceback", "subprocess",
+                 "async_timeout", "asyncio", "asyncio.compat", "asyncio.base_futures",
+                 "asyncio.base_events", "asyncio.base_tasks", "asyncio.base_subprocess",
+                 "asyncio.proactor_events", "asyncio.constants","asyncio.selector_events",
+                 "asyncio.windows_utils"],
+    "excludes": ["tkinter", "_tkinter", '_gtkagg', '_tkagg', 'bsddb', 'curses',
+                 'pywin.debugger', 'pywin.debugger.dbgcon', 'pywin.dialogs', 'tcl',
+                 'unittest', 'idlelib', 'certifi', 'nacl', "_lzma", "_hashlib", "_bz2"],
     "packages":["oyoyo"],
     "include_files":include_files,
     }
