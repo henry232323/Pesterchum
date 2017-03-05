@@ -1,31 +1,31 @@
 import json, os
 
 default_options = {
-    "chum_list":{
-        "hide_offline_chums":False,
-        "show_empty_groups":False,
-        "show_number_of_online_chums":False,
-        "sort_chums":0,
-        "low_bandwidth":False
+    "chum_list": {
+        "hide_offline_chums": False,
+        "show_empty_groups": False,
+        "show_number_of_online_chums": False,
+        "sort_chums": 0,
+        "low_bandwidth": False
         },
-    "conversations":{
-        "time_stamps":True,
-        "clock_type":1,
-        "show_seconds":False,
-        "op_and_voice_in_memos":False,
-        "use_animated_smilies":False,
-        "receive_random_encounters":False,
+    "conversations": {
+        "time_stamps": True,
+        "clock_type": 1,
+        "show_seconds": False,
+        "op_and_voice_in_memos": False,
+        "use_animated_smilies": False,
+        "receive_random_encounters": False,
         },
-    "interface":{
-        "tabbed_conversations":True,
-        "tabbed_memos":True,
-        "minimize":0,
-        "close":1,
-        "blink_taskbar_on_pesters":False,
-        "blink_taskbar_on_memos":False
+    "interface": {
+        "tabbed_conversations": True,
+        "tabbed_memos": True,
+        "minimize": 0,
+        "close": 1,
+        "blink_taskbar_on_pesters": False,
+        "blink_taskbar_on_memos": False
         },
-    "theme":{
-        "theme":"pesterchum2.5"
+    "theme": {
+        "theme": "pesterchum2.5"
         }
     }
 
