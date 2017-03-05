@@ -74,7 +74,7 @@ class App(QApplication):
             self.cli()
 
         self.gui.initialize()
-        playsound(os.path.join(self.theme["path"], "alarm.wav"))
+        playsound(os.path.join(self.theme["path"], "alarm.wav"), block=False)
         loop.run_forever()
 
     def cli(self):
@@ -227,7 +227,7 @@ class App(QApplication):
 
     def pm_received(self, msg, user):
         '''Display processed message, called by process_received_msg'''
-        playsound(os.path.join(self.theme["path"], "alarm.wav"))
+        playsound(os.path.join(self.theme["path"], "alarm.wav"), block=False)
         tab = self.gui.start_privmsg(user)
         tab.display_text(msg)
 
@@ -235,16 +235,16 @@ class App(QApplication):
         '''Display pm begin message, begin pm
         Called when PESTERCHUM:BEGIN received
         And on PM started'''
-        playsound(os.path.join(self.theme["path"], "alarm.wav"))
+        playsound(os.path.join(self.theme["path"], "alarm.wav"), block=False)
         tab = self.gui.start_privmsg(user)
         tab.display_text(msg)
 
     def pm_cease(self, msg, user):
         '''Called when PM is closed or receive PESTERCHUM:CEASE'''
-        playsound(os.path.join(self.theme["path"], "cease.wav"))
+        playsound(os.path.join(self.theme["path"], "cease.wav"), block=False)
 
     def memo_received(self, msg, user, memo):
-        playsound(os.path.join(self.theme["path"], "alarm2.wav"))
+        playsound(os.path.join(self.theme["path"], "alarm2.wav"), block=False)
         if self.gui.memoTabWindow:
             tab = self.gui.memoTabWindow.getWidget(memo)
             if tab:
